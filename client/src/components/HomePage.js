@@ -1,65 +1,63 @@
 import React, { Component } from 'react';
-import { Query } from 'react-apollo';
 import { connect } from 'react-redux';
 
-import { getUserQuery } from '../queries/index';
-import { logoutAction } from '../actions/index';
+import {
+    logoutAction,
+    getUserInfoAction
+} from '../actions/index';
 
 class Home extends Component {
     constructor(props) {
         super(props);
     }
 
+    componentDidMount() {
+        const { dispatchGetUserInfo, userId } = this.props;
+        if (userId) {
+            dispatchGetUserInfo(userId);
+        }
+    }
+
     render() {
-        const { userId, dispatchLogout } = this.props;
+        const { dispatchLogout, userInfo } = this.props;
+        console.log(this.props.userInfo);
+        if (!userInfo) {
+            return null;
+        }
         return (
-            <div className="columns is-centered" style={{
-                padding: "2%"
-            }}>
-                <div className="column is-half">
-                    <h1 className="is-size-3"> Welcome </h1>
-                    <Query query={getUserQuery} variables={{ userId }}>
-                        {({ loading, error, data }) => {
-                            if (loading) {
-                                return null;
-                            }
-
-
-                            if (error) {
-                                console.log(error.message);
-                                return null;
-                            }
-
-                            console.log(data);
-
-                            return data.users.map(user => {
-                                return (
-                                    <p> {user.email} </p>
-                                )
-                            });
-                        }}
-                    </Query>
-                    <div class="field">
-                        <p class="control">
-                            <button class="button is-primary" onClick={e => dispatchLogout()}>
-                                Logout
-                        </button>
-                        </p>
+            <section className="hero has-background-white-bis is-fullheight">
+                <div className="columns is-centered" style={{
+                    padding: "2%"
+                }}>
+                    <div className="column is-half">
+                        <h1 className="is-size-3"> Welcome, {userInfo.email} </h1>
+                        <div className="field">
+                            <p className="control">
+                                <button className="button is-primary" onClick={e => dispatchLogout()}>
+                                    Logout
+                                </button>
+                            </p>
+                        </div>
                     </div>
                 </div>
-            </div>
+            </section>
         )
     }
 }
 
 const mapStateToProps = ({
     isAuthorized,
+    userId,
+    userInfo
 }) => ({
     isAuthorized,
+    userId,
+    userInfo
 })
 
 const mapDispatchToProps = dispatch => ({
-    dispatchLogout: () => dispatch(logoutAction())
+    dispatchLogout: () => dispatch(logoutAction()),
+    dispatchGetUserInfo: (userId) => dispatch(getUserInfoAction(userId))
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Home);

@@ -1,10 +1,16 @@
 import {
-    updateLoginStatus
+    updateLoginStatus,
+    updateSignUpStatus,
+    getUserInfo,
 } from '../actions/action_types';
 
 const defaultState = {
     isAuthorized: false,
     userId: null,
+    loginMessage: null,
+    signUpStatus: false,
+    signUpMessage: null,
+    userInfo: null,
 }
 
 const rootReducer = (state = defaultState, action) => {
@@ -13,9 +19,20 @@ const rootReducer = (state = defaultState, action) => {
             return {
                 ...state,
                 isAuthorized: action.isAuthorized,
-                userId: action.userId
+                userId: action.userId,
+                loginMessage: action.message,
             };
-
+        case updateSignUpStatus:
+            return {
+                ...state,
+                signUpStatus: action.signUpStatus,
+                signUpMessage: action.signUpMessage
+            }
+        case getUserInfo:
+            return {
+                ...state,
+                userInfo: action.userInfo,
+            }
         default:
             return state;
     }

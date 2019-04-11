@@ -1,8 +1,6 @@
 import React, { Component } from 'react';
-import { Mutation } from 'react-apollo';
 import { connect } from 'react-redux';
 
-import { addUserMutation } from '../queries/index';
 import {
     signUpAction
 } from '../actions/index';
@@ -20,10 +18,8 @@ class SignUp extends Component {
     }
 
     render() {
-        const { email, password, submitted, success } = this.state;
-        const {dispatchSignUp, userId} = this.props;
-
-        console.log(`signUp: ${userId}`);
+        const { email, password } = this.state;
+        const {dispatchSignUp, signUpStatus, signUpMessage} = this.props;
 
         return (
             <div className="columns is-centered" style={{
@@ -31,46 +27,35 @@ class SignUp extends Component {
             }}>
                 <div className="column is-half">
                     <h1 className="is-size-3 has-text-centered"> Sign Up :) </h1>
-                    <div class="field">
-                        <p class="control has-icons-left has-icons-right">
-                            <input class="input" type="email" placeholder="Email" onChange={e => this.setState({ email: e.target.value })} />
-                            <span class="icon is-small is-left">
-                                <i class="fas fa-envelope"></i>
-                            </span>
-                            <p class="help">This is a help text</p>
-                        </p>
-                    </div>
-                    <div class="field">
-                        <p class="control has-icons-left">
-                            <input class="input" type="password" placeholder="Password" onChange={e => this.setState({ password: e.target.value })} />
-                            <span class="icon is-small is-left">
-                                <i class="fas fa-lock"></i>
+                    <div className="field">
+                        <p className="control has-icons-left has-icons-right">
+                            <input className="input" type="email" placeholder="Email" onChange={e => this.setState({ email: e.target.value })} />
+                            <span className="icon is-small is-left">
+                                <i className="fas fa-envelope"></i>
                             </span>
                         </p>
                     </div>
-                    <div class="field is-grouped is-grouped-centered">
-                        <p class="control">
-                            <button class="button is-primary" onClick={e => this.props.history.push('./')}>
+                    <div className="field">
+                        <p className="control has-icons-left">
+                            <input className="input" type="password" placeholder="Password" onChange={e => this.setState({ password: e.target.value })} />
+                            <span className="icon is-small is-left">
+                                <i className="fas fa-lock"></i>
+                            </span>
+                        </p>
+                    </div>
+                    <div className="field is-grouped is-grouped-centered">
+                        <p className="control">
+                            <button className="button is-primary" onClick={e => this.props.history.push('./')}>
                                 Back to Home
                             </button>
                         </p>
-                        <p class="control">
-                            <button class="button is-primary" onClick={e => dispatchSignUp(email, password)}>
+                        <p className="control">
+                            <button className="button is-primary" onClick={e => dispatchSignUp(email, password)}>
                                 Sign Up
                             </button>
                         </p>
                     </div>
-
-                    {/* {submitted && <Mutation mutation={addUserMutation}>
-                        {addUser => {
-                            addUser({ variables: { email, password } })
-                            {this.setState({ submitted: false, success: true })}
-
-                            return null;
-                        }}
-                    </Mutation>} */}
-
-                    {success && <p class="help has-text-centered">Successful sign up</p>}
+                    {signUpStatus && <p className="help has-text-centered"> {signUpMessage} </p>}
                 </div >
             </div >
         )
@@ -78,9 +63,11 @@ class SignUp extends Component {
 }
 
 const mapStateToProps = ({
-    userId
+    signUpStatus,
+    signUpMessage
 }) => ({
-    userId
+    signUpStatus,
+    signUpMessage
 })
 
 const mapDispatchToProps = dispatch => ({
