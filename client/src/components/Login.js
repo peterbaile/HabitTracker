@@ -4,7 +4,10 @@ import { Query } from 'react-apollo';
 
 import { getUserQuery } from '../queries/index';
 import Home from './HomePage';
-import { login } from '../actions/index';
+import {
+    loginAction
+} from '../actions/index';
+
 
 class Login extends Component {
     constructor(props) {
@@ -12,15 +15,13 @@ class Login extends Component {
         this.state = {
             email: null,
             password: null,
-            userId: null,
-            submitted: false,
         }
     }
 
     render() {
-        const { email, password, userId, submitted } = this.state;
-        const { dispatchLogin, isAuthorized } = this.props;
-
+        const { email, password} = this.state;
+        const { dispatchLogin, isAuthorized, userId } = this.props;
+        console.log(`userId: ${userId}`);
         if (isAuthorized) {
             return (
                 <Home userId={userId} />
@@ -52,7 +53,7 @@ class Login extends Component {
                     </div>
                     <div class="field is-grouped is-grouped-centered">
                         <p class="control">
-                            <button class="button is-primary" onClick={e => this.setState({ submitted: true })}>
+                            <button class="button is-primary" onClick={e => dispatchLogin(email, password)}>
                                 Login
                             </button>
                         </p>
@@ -62,28 +63,6 @@ class Login extends Component {
                             </button>
                         </p>
                     </div>
-
-                    {submitted && <Query query={getUserQuery} variables={{ email, password }}>
-                        {({ loading, error, data }) => {
-                            if (loading) {
-                                return null;
-                            }
-
-                            if (error) {
-                                console.log(error.message);
-                                return null;
-                            }
-
-                            this.setState({ submitted: false });
-
-                            data.users.map(user => {
-                                this.setState({ userId: user.id, isAuthorized: true })
-                                dispatchLogin();
-                            });
-
-                            return null;
-                        }}
-                    </Query>}
                 </div >
             </div >
         )
@@ -92,12 +71,14 @@ class Login extends Component {
 
 const mapStateToProps = ({
     isAuthorized,
+    userId
 }) => ({
     isAuthorized,
+    userId
 })
 
 const mapDispatchToProps = dispatch => ({
-    dispatchLogin: () => dispatch(login())
+    dispatchLogin: (email, password) => dispatch(loginAction(email, password))
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Login);

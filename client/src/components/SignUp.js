@@ -1,7 +1,11 @@
 import React, { Component } from 'react';
 import { Mutation } from 'react-apollo';
+import { connect } from 'react-redux';
 
 import { addUserMutation } from '../queries/index';
+import {
+    signUpAction
+} from '../actions/index';
 
 class SignUp extends Component {
     constructor(props) {
@@ -17,8 +21,9 @@ class SignUp extends Component {
 
     render() {
         const { email, password, submitted, success } = this.state;
+        const {dispatchSignUp, userId} = this.props;
 
-        console.log(submitted);
+        console.log(`signUp: ${userId}`);
 
         return (
             <div className="columns is-centered" style={{
@@ -50,20 +55,20 @@ class SignUp extends Component {
                             </button>
                         </p>
                         <p class="control">
-                            <button class="button is-primary" onClick={e => this.setState({ submitted: true })}>
+                            <button class="button is-primary" onClick={e => dispatchSignUp(email, password)}>
                                 Sign Up
                             </button>
                         </p>
                     </div>
 
-                    {submitted && <Mutation mutation={addUserMutation}>
+                    {/* {submitted && <Mutation mutation={addUserMutation}>
                         {addUser => {
                             addUser({ variables: { email, password } })
                             {this.setState({ submitted: false, success: true })}
 
                             return null;
                         }}
-                    </Mutation>}
+                    </Mutation>} */}
 
                     {success && <p class="help has-text-centered">Successful sign up</p>}
                 </div >
@@ -72,4 +77,14 @@ class SignUp extends Component {
     }
 }
 
-export default SignUp;
+const mapStateToProps = ({
+    userId
+}) => ({
+    userId
+})
+
+const mapDispatchToProps = dispatch => ({
+    dispatchSignUp: (email, password) => dispatch(signUpAction(email, password))
+})
+
+export default connect(mapStateToProps, mapDispatchToProps)(SignUp);

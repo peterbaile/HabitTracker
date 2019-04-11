@@ -3,7 +3,7 @@ import { Query } from 'react-apollo';
 import { connect } from 'react-redux';
 
 import { getUserQuery } from '../queries/index';
-import { logout } from '../actions/index';
+import { logoutAction } from '../actions/index';
 
 class Home extends Component {
     constructor(props) {
@@ -59,7 +59,7 @@ const mapStateToProps = ({
 })
 
 const mapDispatchToProps = dispatch => ({
-    dispatchLogout: () => dispatch(logout())
+    dispatchLogout: () => dispatch(logoutAction())
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Home);

@@ -1,1 +1,1 @@
-export const updateAuthStatus = 'UPDATE_AUTH_STATUS';
+export const updateLoginStatus = 'UPDATE_LOGIN_STATUS';
