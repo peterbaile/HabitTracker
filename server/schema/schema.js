@@ -85,32 +85,55 @@ const Mutation = new GraphQLObjectType({
             })
         },
 
-        addHabit:{
+        // support the function of adding a non-existing habit
+        addHabit: {
             type: habitsType,
             args: getGraphQLUpdateArgs(habitsType),
             resolve: getMongoDbUpdateResolver(habitsType, async (filter, update) => {
-                return await Habits.create(update['$set']);
+                const userId = mongoose.Types.ObjectId(update['$set'].userId);
+                const originalUserInfo = await Habits.findOne({ userId: userId });
+
+                // If there is no habit for the user
+                if (!originalUserInfo) {
+                    return await Habits.create(update['$set']);
+                }
+
+                // If there is ≥1 habit for the user
+                const originalHabits = originalUserInfo.habits;
+                // originalHabits now become the newHabits
+                originalHabits.push(update['$set'].habits[0]);
+                await Habits.findOneAndUpdate({ userId: userId }, { habits: originalHabits });
+
+                return await Habits.findOne({ userId: userId })
+
             })
         },
 
+        // support the function of updating an existing habit
         updateHabit: {
             type: habitsType,
             args: getGraphQLUpdateArgs(habitsType),
             resolve: getMongoDbUpdateResolver(habitsType, async (filter, update) => {
                 const userId = mongoose.Types.ObjectId(filter.userId['$eq']);
+                const habitName = filter.habits['$elemMatch'].name['$eq'];
+                console.log(habitName);
                 console.log(userId);
                 console.log(update['$set'].habits[0].name);
-                const originalHabits = await Habits.findOne({userId: userId});
+                const originalHabits = await Habits.findOne({ userId: userId });
                 console.log("---Original Habits----");
                 console.log(originalHabits.habits);
 
-                if (originalHabits.habits.length === 0){
-                    const obj = await Habits.findOne({userId: userId});
+                console.log("---Objects quiried using filter directly----");
+                const filterObject = await Habits.findOne(filter);
+                console.log(filterObject);
+
+                if (originalHabits.habits.length === 0) {
+                    const obj = await Habits.findOne({ userId: userId });
                     console.log(obj);
-                    await Habits.findOneAndUpdate({userId: userId}, {habits: update['$set'].habits});
+                    await Habits.findOneAndUpdate({ userId: userId }, { habits: update['$set'].habits });
                 }
 
-                return await Habits.find({userId: userId});
+                return Habits.findOne({ userId: userId })
             })
         }
     }
