@@ -16,11 +16,14 @@ const {
 } = graphql;
 
 const Users = require('../models/users');
+const Habits = require('../models/habits');
+const habitsType = require('./habitsType');
 
 const userFields = {
     id: { type: GraphQLID },
     email: { type: new GraphQLNonNull(GraphQLString) },
-    password: { type: new GraphQLNonNull(GraphQLString) }
+    password: { type: new GraphQLNonNull(GraphQLString) },
+    username: { type: new GraphQLNonNull(GraphQLString) },
 };
 
 const usersInputType = new GraphQLObjectType({
@@ -41,12 +44,19 @@ const RootQuery = new GraphQLObjectType({
             args: getGraphQLQueryArgs(usersInputType),
             resolve: getMongoDbQueryResolver(usersInputType, async (filter, projection, options) => {
                 if (filter.id) {
-					filter['_id'] = mongoose.Types.ObjectId(filter.id['$eq']);
-					delete filter.id;
-				};
+                    filter['_id'] = mongoose.Types.ObjectId(filter.id['$eq']);
+                    delete filter.id;
+                };
                 const users = await Users.find(filter, null, options);
                 console.log(users);
                 return users;
+            })
+        },
+        habits: {
+            type: habitsType,
+            args: getGraphQLQueryArgs(habitsType),
+            resolve: getMongoDbQueryResolver(habitsType, async (filter, projection, options) => {
+                return await Habits.find(filter, null, options);
             })
         }
     }
@@ -61,7 +71,7 @@ const Mutation = new GraphQLObjectType({
             resolve: getMongoDbUpdateResolver(usersInputType, async (filter, update) => {
 
                 const user = update['$set'];
-                
+
                 if (!user.email || !user.password) {
                     throw new Error("Error: Your email or password is empty");
                 }
@@ -72,6 +82,35 @@ const Mutation = new GraphQLObjectType({
                     console.log(err);
                     throw new Error("Error occurs");
                 }
+            })
+        },
+
+        addHabit:{
+            type: habitsType,
+            args: getGraphQLUpdateArgs(habitsType),
+            resolve: getMongoDbUpdateResolver(habitsType, async (filter, update) => {
+                return await Habits.create(update['$set']);
+            })
+        },
+
+        updateHabit: {
+            type: habitsType,
+            args: getGraphQLUpdateArgs(habitsType),
+            resolve: getMongoDbUpdateResolver(habitsType, async (filter, update) => {
+                const userId = mongoose.Types.ObjectId(filter.userId['$eq']);
+                console.log(userId);
+                console.log(update['$set'].habits[0].name);
+                const originalHabits = await Habits.findOne({userId: userId});
+                console.log("---Original Habits----");
+                console.log(originalHabits.habits);
+
+                if (originalHabits.habits.length === 0){
+                    const obj = await Habits.findOne({userId: userId});
+                    console.log(obj);
+                    await Habits.findOneAndUpdate({userId: userId}, {habits: update['$set'].habits});
+                }
+
+                return await Habits.find({userId: userId});
             })
         }
     }
