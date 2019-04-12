@@ -18,45 +18,34 @@ const {
 const Users = require('../models/users');
 const Habits = require('../models/habits');
 const habitsType = require('./habitsType');
+const usersType = require('./usersType');
 
-const userFields = {
-    id: { type: GraphQLID },
-    email: { type: new GraphQLNonNull(GraphQLString) },
-    password: { type: new GraphQLNonNull(GraphQLString) },
-    username: { type: new GraphQLNonNull(GraphQLString) },
-};
-
-const usersInputType = new GraphQLObjectType({
-    name: "UsersInput",
-    fields: () => userFields
-})
-
-const usersReturnType = new GraphQLObjectType({
-    name: "UsersReturn",
-    fields: () => userFields
-})
+const convertDate = (date) => {
+    return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`
+}
 
 const RootQuery = new GraphQLObjectType({
     name: 'RootQueryType',
     fields: {
         users: {
-            type: new GraphQLList(usersReturnType),
-            args: getGraphQLQueryArgs(usersInputType),
-            resolve: getMongoDbQueryResolver(usersInputType, async (filter, projection, options) => {
+            type: new GraphQLList(usersType),
+            args: getGraphQLQueryArgs(usersType),
+            resolve: getMongoDbQueryResolver(usersType, async (filter, projection, options) => {
                 if (filter.id) {
                     filter['_id'] = mongoose.Types.ObjectId(filter.id['$eq']);
                     delete filter.id;
                 };
                 const users = await Users.find(filter, null, options);
-                console.log(users);
                 return users;
             })
         },
+
         habits: {
             type: habitsType,
             args: getGraphQLQueryArgs(habitsType),
             resolve: getMongoDbQueryResolver(habitsType, async (filter, projection, options) => {
-                return await Habits.find(filter, null, options);
+                const userId = mongoose.Types.ObjectId(filter.userId['$eq']);
+                return await Habits.findOne({ userId: userId })
             })
         }
     }
@@ -66,22 +55,32 @@ const Mutation = new GraphQLObjectType({
     name: 'Mutation',
     fields: {
         addUser: {
-            type: usersReturnType,
-            args: getGraphQLUpdateArgs(usersInputType),
-            resolve: getMongoDbUpdateResolver(usersInputType, async (filter, update) => {
-
+            type: usersType,
+            args: getGraphQLUpdateArgs(usersType),
+            resolve: getMongoDbUpdateResolver(usersType, async (filter, update) => {
                 const user = update['$set'];
 
-                if (!user.email || !user.password) {
-                    throw new Error("Error: Your email or password is empty");
+                if (!user.email || !user.password || !user.username) {
+                    throw new Error("Error: Your email, password, or username is empty");
                 }
 
-                try {
-                    return await Users.create(update['$set']);
-                } catch (err) {
-                    console.log(err);
-                    throw new Error("Error occurs");
+                const users = await Users.findOne({email: user.email});
+
+                if (users){
+                    throw new Error("Found Duplicate Emails");
                 }
+
+                return await Users.create(update['$set']);
+            })
+        },
+
+        updateUser: {
+            type: usersType,
+            args: getGraphQLUpdateArgs(usersType),
+            resolve: getMongoDbUpdateResolver(usersType, async (filter, update) => {
+                const id = mongoose.Types.ObjectId(filter.id['$eq']);
+                await Users.findByIdAndUpdate(id, update['$set']);
+                return Users.findById(id);
             })
         },
 
@@ -90,7 +89,7 @@ const Mutation = new GraphQLObjectType({
             type: habitsType,
             args: getGraphQLUpdateArgs(habitsType),
             resolve: getMongoDbUpdateResolver(habitsType, async (filter, update) => {
-                const userId = mongoose.Types.ObjectId(update['$set'].userId);
+                const userId = mongoose.Types.ObjectId(filter.userId['$eq']);
                 const originalUserInfo = await Habits.findOne({ userId: userId });
 
                 // If there is no habit for the user
@@ -100,40 +99,87 @@ const Mutation = new GraphQLObjectType({
 
                 // If there is ≥1 habit for the user
                 const originalHabits = originalUserInfo.habits;
+                const newHabit = update['$set'].habits[0];
+
+                // check if there is a duplication of name for the newHabit
+                const habitArray = originalHabits.filter(habit => habit.name === newHabit.name);
+                if (habitArray.length !== 0) {
+                    throw new Error("Error: Found duplicate habit name");
+                }
+
                 // originalHabits now become the newHabits
-                originalHabits.push(update['$set'].habits[0]);
+                originalHabits.push(newHabit);
                 await Habits.findOneAndUpdate({ userId: userId }, { habits: originalHabits });
 
-                return await Habits.findOne({ userId: userId })
-
+                return await Habits.findOne({ userId: userId });
             })
         },
 
         // support the function of updating an existing habit
+        // times can be null
         updateHabit: {
+            type: habitsType,
+            args: getGraphQLUpdateArgs(habitsType),
+            resolve: getMongoDbUpdateResolver(habitsType, async (filter, update) => {
+                const updateSet = update['$set'].habits[0];
+                const userId = mongoose.Types.ObjectId(filter.userId['$eq']);
+                const habitName = filter.habits['$elemMatch'].name['$eq'];
+
+                const originalUserInfo = await Habits.findOne({ userId: userId });
+
+                const originalHabits = originalUserInfo.habits;
+
+                // update originalHabits to newHabits
+                originalHabits.map(habit => {
+                    if (habit.name === habitName) {
+                        for (x in updateSet) {
+                            if (x === 'records') {
+                                // check if the record at the same date already exists
+                                const dateArray = habit.records.filter(record => {
+                                    const existingDate = record.date;
+                                    const updateDate = updateSet['records'][0].date;
+                                    return convertDate(existingDate) === convertDate(updateDate);
+                                });
+
+                                // record does not exist
+                                if (dateArray.length === 0) {
+                                    habit.records.push(updateSet['records'][0]);
+                                } else {
+                                    habit.records.map(record => {
+                                        if (convertDate(record.date) === convertDate(updateSet['records'][0].date)) {
+                                            record.times = updateSet['records'][0].times
+                                        }
+                                    })
+                                }
+                            } else {
+                                habit[x] = updateSet[x];
+                            }
+                        }
+                    }
+                })
+
+                await Habits.findOneAndUpdate({ userId: userId }, { habits: originalHabits });
+
+                return await Habits.findOne({ userId: userId })
+            })
+        },
+
+        removeHabit: {
             type: habitsType,
             args: getGraphQLUpdateArgs(habitsType),
             resolve: getMongoDbUpdateResolver(habitsType, async (filter, update) => {
                 const userId = mongoose.Types.ObjectId(filter.userId['$eq']);
                 const habitName = filter.habits['$elemMatch'].name['$eq'];
-                console.log(habitName);
-                console.log(userId);
-                console.log(update['$set'].habits[0].name);
-                const originalHabits = await Habits.findOne({ userId: userId });
-                console.log("---Original Habits----");
-                console.log(originalHabits.habits);
 
-                console.log("---Objects quiried using filter directly----");
-                const filterObject = await Habits.findOne(filter);
-                console.log(filterObject);
+                const originalUserInfo = await Habits.findOne({ userId: userId });
 
-                if (originalHabits.habits.length === 0) {
-                    const obj = await Habits.findOne({ userId: userId });
-                    console.log(obj);
-                    await Habits.findOneAndUpdate({ userId: userId }, { habits: update['$set'].habits });
-                }
+                const originalHabits = originalUserInfo.habits;
 
-                return Habits.findOne({ userId: userId })
+                const newHabits = originalHabits.filter(habit => habit.name !== habitName);
+
+                await Habits.findOneAndUpdate({ userId: userId }, { habits: newHabits });
+
+                return await Habits.findOne({ userId: userId })
             })
         }
     }
