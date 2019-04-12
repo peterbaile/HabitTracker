@@ -5,8 +5,10 @@ import {
 } from '../actions/action_types';
 
 const defaultState = {
-    isAuthorized: false,
-    userId: null,
+    isAuthorized: true, //wrong
+    // isAuthorized: false,
+    userId: "5cafc7f6615d1d268211fc34", //wrong
+    // userId: null,
     loginMessage: null,
     signUpStatus: false,
     signUpMessage: null,

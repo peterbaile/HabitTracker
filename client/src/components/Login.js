@@ -20,6 +20,7 @@ class Login extends Component {
         const { email, password } = this.state;
         const { dispatchLogin, isAuthorized, userId, loginMessage } = this.props;
 
+
         if (isAuthorized) {
             return (
                 <Home />

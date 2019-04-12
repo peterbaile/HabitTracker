@@ -5,6 +5,7 @@ import {
     logoutAction,
     getUserInfoAction
 } from '../actions/index';
+import Form from './HabitForm';
 
 class Home extends Component {
     constructor(props) {
@@ -24,20 +25,45 @@ class Home extends Component {
         if (!userInfo) {
             return null;
         }
+
+        console.log(window.innerHeight);
+
         return (
             <section className="hero has-background-white-bis is-fullheight">
-                <div className="columns is-centered" style={{
-                    padding: "2%"
+
+                <h1 className="is-size-3"> Welcome, {userInfo.email} </h1>
+                <div className="field">
+                    <p className="control">
+                        <button className="button is-primary" onClick={e => dispatchLogout()}>
+                            Logout
+                        </button>
+                    </p>
+                </div>
+
+                <div className="columns" style={{
+                    margin: "2%",
+                    height: window.innerHeight
                 }}>
-                    <div className="column is-half">
-                        <h1 className="is-size-3"> Welcome, {userInfo.email} </h1>
-                        <div className="field">
-                            <p className="control">
-                                <button className="button is-primary" onClick={e => dispatchLogout()}>
-                                    Logout
-                                </button>
+
+                    <div class="column is-one-third">
+                        <div class="menu">
+                            <p class="menu-label">
+                                Habits
                             </p>
+                            <ul class="menu-list">
+                                <li><a>Dashboard</a></li>
+                                <li><a>Dashboard</a></li>
+                                <li><a className="is-active">Dashboard</a></li>
+                                <li><a>Customers</a></li>
+                            </ul>
                         </div>
+                        <br />
+                        <div>
+                            <a> Add a new Habit </a>
+                        </div>
+                    </div>
+                    <div className="column is-two-thirds">
+                        <Form />
                     </div>
                 </div>
             </section>
