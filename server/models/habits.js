@@ -9,6 +9,9 @@ const recordSchema = new Schema({
 const habitSchema = new Schema({
     name: { type: String },
     status: { type: String },
+    goalPeriod: { type: String },
+    target: { type: Number },
+    message: { type: String },
     records: { type: [recordSchema] }
 })
 

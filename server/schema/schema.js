@@ -94,6 +94,7 @@ const Mutation = new GraphQLObjectType({
 
                 // If there is no habit for the user
                 if (!originalUserInfo) {
+                    update['$set'].userId = userId;
                     return await Habits.create(update['$set']);
                 }
 

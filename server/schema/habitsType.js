@@ -9,7 +9,7 @@ const {
 } = graphql;
 const { GraphQLDateTime } = require('graphql-iso-date');
 
-const recordsType = new GraphQLObjectType({
+const recordType = new GraphQLObjectType({
     name: 'Records',
     fields: () => ({
         date: { type: GraphQLDateTime },
@@ -22,7 +22,10 @@ const habitType = new GraphQLObjectType({
     fields: () => ({
         name: { type: GraphQLString },
         status: { type: GraphQLString },
-        records: { type: new GraphQLList(recordsType) }
+        goalPeriod: { type: GraphQLString },
+        target: { type: GraphQLInt },
+        message: { type: GraphQLString },
+        records: { type: new GraphQLList(recordType) }
     })
 })
 
