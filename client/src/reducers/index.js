@@ -3,7 +3,8 @@ import {
     updateSignUpStatus,
     getUserInfo,
     getHabitsInfo,
-    updateHabitSelection
+    updateHabitSelection,
+    updateSelectedDate,
 } from '../actions/action_types';
 
 const defaultState = {
@@ -17,6 +18,8 @@ const defaultState = {
     userInfo: null,
     userHabits: null,
     selectedHabit: null,
+    selectedDate: new Date(),
+    times: null,
 }
 
 const rootReducer = (state = defaultState, action) => {
@@ -48,6 +51,12 @@ const rootReducer = (state = defaultState, action) => {
             return {
                 ...state,
                 selectedHabit: action.selectedHabit
+            }
+        case updateSelectedDate:
+            return {
+                ...state,
+                selectedDate: action.selectedDate,
+                times: action.times
             }
         default:
             return state;

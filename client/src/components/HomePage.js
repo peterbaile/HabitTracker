@@ -72,8 +72,6 @@ class Home extends Component {
             selectedHabit 
         } = this.props;
 
-        console.log(selectedHabit)
-
         if (!userInfo || !userHabits) {
             return null;
         }
@@ -103,7 +101,7 @@ class Home extends Component {
                             <ul className="menu-list">
                                 {userHabits.map(habit => {
                                     return (
-                                        <li><a className={habit.name === selectedHabit ? "is-active" : null} onClick={e => this.handleClick(habit.name)}> {habit.name} </a> </li>
+                                        <li><a className={habit.name === selectedHabit ? "is-active" : null} onClick={e => this.handleClick(habit.name)}> {habit.name.toUpperCase()} </a> </li>
                                     )
                                 })}
                             </ul>

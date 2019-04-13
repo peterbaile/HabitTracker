@@ -8,6 +8,7 @@ import {
     getUserInfo,
     getHabitsInfo,
     updateHabitSelection,
+    updateSelectedDate,
 } from './action_types';
 
 import {
@@ -23,6 +24,17 @@ import {
 const client = new ApolloClient({
     uri: 'http://localhost:3001/graphql'
 })
+
+
+export const updateSelectedDateAction = (currentDate, times) => {
+    return (dispatch) => {
+        dispatch({
+            type: updateSelectedDate,
+            selectedDate: currentDate,
+            times: times,
+        })
+    }
+}
 
 export const loginAction = (email, password) => {
     return (dispatch) => {
@@ -157,7 +169,21 @@ export const addHabitAction = (userId, updateSet) => {
         client.mutate({ mutation: addHabitMutation, variables: updateSet }).then(
             result => {
                 const habits = result.data.addHabit.habits;
-                console.log(habits);
+                dispatch({
+                    type: getHabitsInfo,
+                    habitsInfo: habits,
+                })
+            }
+        )
+    }
+}
+
+export const updateHabitAction = (userId, updateSet) => {
+    return (dispatch) => {
+        updateSet.userId = userId;
+        client.mutate({mutation: updateHabitMutation, variables: updateSet}).then(
+            result => {
+                const habits = result.data.updateHabit.habits;
                 dispatch({
                     type: getHabitsInfo,
                     habitsInfo: habits,
