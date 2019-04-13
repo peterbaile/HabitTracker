@@ -3,35 +3,84 @@ import { connect } from 'react-redux';
 
 import {
     logoutAction,
-    getUserInfoAction
+    getUserInfoAction,
+    getHabitsAction,
+    updateHabitSelectionAction
 } from '../actions/index';
+
 import Form from './HabitForm';
+import HabitInfo from './HabitInfo';
 
 class Home extends Component {
     constructor(props) {
         super(props);
+        this.state = {
+            displayForm: false
+        }
     }
 
     componentDidMount() {
-        const { dispatchGetUserInfo, userId } = this.props;
+        const { 
+            userHabits, 
+            dispatchUpdateHabitSelection,
+            dispatchGetUserInfo,
+            dispatchGetHabitsInfo,
+            userId
+        } = this.props;
+
         if (userId) {
             dispatchGetUserInfo(userId);
+            dispatchGetHabitsInfo(userId);
         }
     }
 
+    renderRightPart(){
+        const { displayForm } = this.state;
+        const { 
+            selectedHabit 
+        } = this.props;
+
+        if (!displayForm && !selectedHabit){
+            return (
+                <p> Please Select A Habit </p>
+            )
+        } else if (selectedHabit){
+            return (<HabitInfo/>)
+        } else if (displayForm){
+            return (<Form />)
+        }
+    }
+
+    handleClick(habitName){
+        const {dispatchUpdateHabitSelection} = this.props;
+        dispatchUpdateHabitSelection(habitName);
+        this.setState({displayForm: false});
+    }
+
+    handleAddButtonClick(){
+        const {dispatchUpdateHabitSelection} = this.props;
+        this.setState({ displayForm: true });
+        dispatchUpdateHabitSelection(null);
+    }
+
     render() {
-        const { dispatchLogout, userInfo } = this.props;
-        console.log(this.props.userInfo);
-        if (!userInfo) {
+        const { 
+            dispatchLogout, 
+            userInfo, 
+            userHabits, 
+            
+            selectedHabit 
+        } = this.props;
+
+        console.log(selectedHabit)
+
+        if (!userInfo || !userHabits) {
             return null;
         }
 
-        console.log(window.innerHeight);
-
         return (
             <section className="hero has-background-white-bis is-fullheight">
-
-                <h1 className="is-size-3"> Welcome, {userInfo.email} </h1>
+                <h1 className="is-size-3"> Welcome, {userInfo.username} </h1>
                 <div className="field">
                     <p className="control">
                         <button className="button is-primary" onClick={e => dispatchLogout()}>
@@ -45,25 +94,27 @@ class Home extends Component {
                     height: window.innerHeight
                 }}>
 
-                    <div class="column is-one-third">
-                        <div class="menu">
-                            <p class="menu-label">
+                    <div className="column is-one-third">
+                        <div className="menu">
+                            <p className="menu-label">
                                 Habits
                             </p>
-                            <ul class="menu-list">
-                                <li><a>Dashboard</a></li>
-                                <li><a>Dashboard</a></li>
-                                <li><a className="is-active">Dashboard</a></li>
-                                <li><a>Customers</a></li>
+
+                            <ul className="menu-list">
+                                {userHabits.map(habit => {
+                                    return (
+                                        <li><a className={habit.name === selectedHabit ? "is-active" : null} onClick={e => this.handleClick(habit.name)}> {habit.name} </a> </li>
+                                    )
+                                })}
                             </ul>
                         </div>
                         <br />
                         <div>
-                            <a> Add a new Habit </a>
+                            <a onClick={e => this.handleAddButtonClick()}> Add a new Habit </a>
                         </div>
                     </div>
                     <div className="column is-two-thirds">
-                        <Form />
+                        {this.renderRightPart()}
                     </div>
                 </div>
             </section>
@@ -74,16 +125,22 @@ class Home extends Component {
 const mapStateToProps = ({
     isAuthorized,
     userId,
-    userInfo
+    userInfo,
+    userHabits,
+    selectedHabit
 }) => ({
     isAuthorized,
     userId,
-    userInfo
+    userInfo,
+    userHabits,
+    selectedHabit
 })
 
 const mapDispatchToProps = dispatch => ({
     dispatchLogout: () => dispatch(logoutAction()),
-    dispatchGetUserInfo: (userId) => dispatch(getUserInfoAction(userId))
+    dispatchGetUserInfo: (userId) => dispatch(getUserInfoAction(userId)),
+    dispatchGetHabitsInfo: (userId) => dispatch(getHabitsAction(userId)),
+    dispatchUpdateHabitSelection: habitName => dispatch(updateHabitSelectionAction(habitName)),
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Home);

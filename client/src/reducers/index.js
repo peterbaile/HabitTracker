@@ -2,6 +2,8 @@ import {
     updateLoginStatus,
     updateSignUpStatus,
     getUserInfo,
+    getHabitsInfo,
+    updateHabitSelection
 } from '../actions/action_types';
 
 const defaultState = {
@@ -13,6 +15,8 @@ const defaultState = {
     signUpStatus: false,
     signUpMessage: null,
     userInfo: null,
+    userHabits: null,
+    selectedHabit: null,
 }
 
 const rootReducer = (state = defaultState, action) => {
@@ -34,6 +38,16 @@ const rootReducer = (state = defaultState, action) => {
             return {
                 ...state,
                 userInfo: action.userInfo,
+            }
+        case getHabitsInfo:
+            return {
+                ...state,
+                userHabits: action.habitsInfo
+            }
+        case updateHabitSelection:
+            return {
+                ...state,
+                selectedHabit: action.selectedHabit
             }
         default:
             return state;

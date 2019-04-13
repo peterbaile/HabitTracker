@@ -5,12 +5,19 @@ import ApolloClient from 'apollo-boost';
 import {
     updateLoginStatus,
     updateSignUpStatus,
-    getUserInfo
+    getUserInfo,
+    getHabitsInfo,
+    updateHabitSelection,
 } from './action_types';
 
 import {
     getUserQuery,
-    addUserMutation
+    addUserMutation,
+    updateUserMutation,
+    getHabitsQuery,
+    addHabitMutation,
+    updateHabitMutation,
+    removeHabitMutation,
 } from '../queries/index';
 
 const client = new ApolloClient({
@@ -94,6 +101,67 @@ export const getUserInfoAction = (userId) => {
                     userInfo: users[0]
                 })
 
+            }
+        )
+    }
+}
+
+export const updateUserInfoAction = (userId, updateSet) => {
+    return (dispatch) => {
+        updateSet.userId = userId;
+        client.mutate({ mutation: updateUserMutation, variables: updateSet }).then(
+            result => {
+                const users = result.data.users;
+                dispatch({
+                    type: getUserInfo,
+                    userInfo: users[0]
+                })
+            }
+        )
+    }
+}
+
+export const updateHabitSelectionAction = (habitName) => {
+    return (dispatch) => {
+        dispatch({
+            type: updateHabitSelection,
+            selectedHabit: habitName
+        })
+    }
+}
+
+export const getHabitsAction = (userId) => {
+    return (dispatch) => {
+        client.query({ query: getHabitsQuery, variables: { userId } }).then(
+            result => {
+                if (!result.data.habits) {
+                    dispatch({
+                        type: getHabitsInfo,
+                        habitsInfo: []
+                    })
+                } else {
+                    const habits = result.data.habits.habits;
+                    dispatch({
+                        type: getHabitsInfo,
+                        habitsInfo: habits
+                    })
+                }
+            }
+        )
+    }
+}
+
+export const addHabitAction = (userId, updateSet) => {
+    return (dispatch) => {
+        updateSet.userId = userId;
+        client.mutate({ mutation: addHabitMutation, variables: updateSet }).then(
+            result => {
+                const habits = result.data.addHabit.habits;
+                console.log(habits);
+                dispatch({
+                    type: getHabitsInfo,
+                    habitsInfo: habits,
+                })
             }
         )
     }

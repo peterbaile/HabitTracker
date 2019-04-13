@@ -39,6 +39,9 @@ query($userId: ID){
     habits{
       name
       status
+      goalPeriod
+      target
+      message
       records{
         date
         times
@@ -49,11 +52,51 @@ query($userId: ID){
 `
 
 export const addHabitMutation = gql`
-mutation($userId: ID, $habitName: String, $status: String){
-  addHabit(filter:{userId:{EQ:$userId}}, update:{set:{habits:[{name:$habitName, status: $status}]}}){
+mutation($userId: ID, $name: String, $status: String, $goalPeriod: String, $target: Int, $message: String){
+  addHabit(filter:{userId:{EQ:$userId}}, update:{set:{habits:[{name:$name, status: $status, goalPeriod: $goalPeriod, target: $target, message: $message}]}}){
     habits{
       name
       status
+      goalPeriod
+      target
+      message
+      records{
+        date
+        times
+      }
+    }
+  }
+}
+`
+
+export const updateHabitMutation = gql`
+mutation ($userId: ID, $name: String, $status: String, $goalPeriod: String, $target: Int, $message: String, $date: DateTime, $times: Int){
+  updateHabit(filter: {userId: {EQ: $userId}, habits: {name: {EQ: $name}}}, update: {set: {habits: [{name:$name, status:$status, goalPeriod: $goalPeriod, target: $target, message: $message, records: {date: $date, times: $times}}]}}) {
+    habits {
+      name
+      status
+      goalPeriod
+      target
+      message
+      records{
+        date
+        times
+      }
+    }
+  }
+}
+`
+
+export const removeHabitMutation = gql`
+mutation($userId: ID, $name: String) {
+  removeHabit(filter: {userId: {EQ: $userId}, habits: {name: {EQ: $name}}}, update:{}) {
+    userId
+    habits {
+      name
+      status
+      goalPeriod
+      target
+      message
       records{
         date
         times
