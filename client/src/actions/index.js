@@ -181,6 +181,7 @@ export const addHabitAction = (userId, updateSet) => {
 export const updateHabitAction = (userId, updateSet) => {
     return (dispatch) => {
         updateSet.userId = userId;
+        console.log("!!!");
         client.mutate({mutation: updateHabitMutation, variables: updateSet}).then(
             result => {
                 const habits = result.data.updateHabit.habits;
@@ -188,6 +189,17 @@ export const updateHabitAction = (userId, updateSet) => {
                     type: getHabitsInfo,
                     habitsInfo: habits,
                 })
+            }
+        )
+    }
+}
+
+export const removeHabitAction = (userId, name) => {
+    return (dispatch) => {
+        client.mutate({mutation: removeHabitMutation, variables:{userId, name}}).then(
+            result => {
+                const habits = result.data;
+                console.log(habits);
             }
         )
     }

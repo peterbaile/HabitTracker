@@ -7,6 +7,7 @@ import 'rc-tooltip/assets/bootstrap.css';
 
 import {
     addHabitAction,
+    updateHabitAction,
 } from '../actions/index';
 
 
@@ -39,22 +40,55 @@ class HabitForm extends Component {
         }
     }
 
+    componentDidMount() {
+        const { userHabits, selectedHabit } = this.props;
+        const habit = userHabits.filter(habit => habit.name === selectedHabit)[0];
+
+        if (habit) {
+            this.setState({ name: habit.name, status: habit.status, goalPeriod: habit.goalPeriod, target: habit.target, message: habit.message });
+        }
+    }
+
     onSliderChange = (value) => {
         this.setState({ target: value });
     }
 
+    handleUpdateHabitClick = () => {
+        const { userId, dispatchUpdateHabit } = this.props;
+        dispatchUpdateHabit(userId, this.state);
+    }
+
+    renderSubmitButton = (habit) => {
+        const { dispatchAddHabit, dispatchUpdateHabit, userId } = this.props;
+        if (habit) {
+            return (
+                <button className="button is-warning" onClick={e => this.handleUpdateHabitClick()}>
+                    Update Habit ~
+                </button>
+            )
+        }
+
+        return (
+            <button className="button is-warning" onClick={e => dispatchAddHabit(userId, this.state)}>
+                Let's get started ~
+            </button>
+        )
+    }
+
     render() {
 
+        console.log(this.props);
         const { name, status, goalPeriod, target, message } = this.state;
-        const { userId, dispatchAddHabitAction, userHabits } = this.props;
+        const { userId, dispatchAddHabit, userHabits, selectedHabit } = this.props;
 
+        const habit = userHabits.filter(habit => habit.name === selectedHabit)[0];
 
         return (
             <>
                 <div className="field">
-                    <label className="label"> Enter a name for your new habit </label>
+                    <label className="label"> Enter a name for your habit </label>
                     <p className="control has-icons-left">
-                        <input className="input is-rounded" type="email" placeholder="Reading" onChange={e => this.setState({ name: e.target.value })} />
+                        <input className="input is-rounded" type="text" placeholder="Reading" defaultValue={habit ? habit.name : null} onChange={e => this.setState({ name: e.target.value })} />
                         <span className="icon is-small is-left">
                             <i className="fas fa-signature"></i>
                         </span>
@@ -62,10 +96,10 @@ class HabitForm extends Component {
                 </div>
 
                 <div className="field">
-                    <label className="label"> Choose a status for your new habit </label>
+                    <label className="label"> Choose a status for your habit </label>
                     <div class="control has-icons-left">
                         <div class="select is-rounded">
-                            <select onChange={e => this.setState({ status: e.target.value })}>
+                            <select onChange={e => this.setState({ status: e.target.value })} defaultValue={habit ? habit.status : "Build"}>
                                 <option selected>Build</option>
                                 <option>Quit</option>
                             </select>
@@ -80,7 +114,7 @@ class HabitForm extends Component {
                     <label className="label"> Choose a goal period </label>
                     <div class="control has-icons-left">
                         <div class="select is-rounded">
-                            <select onChange={e => this.setState({ goalPeriod: e.target.value })}>
+                            <select onChange={e => this.setState({ goalPeriod: e.target.value })} defaultValue={habit ? habit.goalPeriod : "Daily"}>
                                 <option selected>Daily</option>
                                 <option>Weekly</option>
                                 <option>Monthly</option>
@@ -97,13 +131,13 @@ class HabitForm extends Component {
                 <div>
                     <p className="help"> Current Target: {target} </p>
                     <br />
-                    <Slider handle={handle} onChange={this.onSliderChange} />
+                    <Slider handle={handle} onChange={this.onSliderChange} value={this.state.target} />
                 </div>
 
                 <div className="field">
                     <label className="label"> Write something to motivate yourself </label>
                     <p className="control has-icons-left">
-                        <input className="input is-rounded" type="email" placeholder="Bruh, Get this shit done" onChange={e => this.setState({ message: e.target.value })} />
+                        <input className="input is-rounded" type="email" placeholder="Bruh, Get this shit done" onChange={e => this.setState({ message: e.target.value })} defaultValue={habit ? habit.message : null} />
                         <span className="icon is-small is-left">
                             <i className="fas fa-fist-raised"></i>
                         </span>
@@ -112,10 +146,12 @@ class HabitForm extends Component {
 
                 <div className="field">
                     <p className="control">
-                        <button className="button is-warning" onClick={e => dispatchAddHabitAction(userId, this.state)}>
-                            Let's get started ~
-                        </button>
+                        {this.renderSubmitButton(habit)}
                     </p>
+                </div>
+
+                <div className="field">
+                    <p className="help has-text-centered"> {userHabits && "Successful Update"} </p>
                 </div>
             </>
         )
@@ -125,13 +161,16 @@ class HabitForm extends Component {
 const mapStateToProps = ({
     userId,
     userHabits,
+    selectedHabit,
 }) => ({
     userId,
     userHabits,
+    selectedHabit,
 })
 
 const mapDispatchToProps = dispatch => ({
-    dispatchAddHabitAction: (userId, updateSet) => dispatch(addHabitAction(userId, updateSet))
+    dispatchAddHabit: (userId, updateSet) => dispatch(addHabitAction(userId, updateSet)),
+    dispatchUpdateHabit: (userId, updateSet) => dispatch(updateHabitAction(userId, updateSet)),
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(HabitForm);

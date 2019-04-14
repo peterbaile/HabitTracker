@@ -23,7 +23,7 @@ class Login extends Component {
 
         if (isAuthorized) {
             return (
-                <Home />
+                <Home history={this.props.history}/>
             )
         }
 

@@ -5,7 +5,8 @@ import {
     logoutAction,
     getUserInfoAction,
     getHabitsAction,
-    updateHabitSelectionAction
+    updateHabitSelectionAction,
+    updateSelectedDateAction,
 } from '../actions/index';
 
 import Form from './HabitForm';
@@ -15,14 +16,12 @@ class Home extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            displayForm: false
+            displayCreateHabitForm: false
         }
     }
 
     componentDidMount() {
-        const { 
-            userHabits, 
-            dispatchUpdateHabitSelection,
+        const {
             dispatchGetUserInfo,
             dispatchGetHabitsInfo,
             userId
@@ -34,42 +33,43 @@ class Home extends Component {
         }
     }
 
-    renderRightPart(){
-        const { displayForm } = this.state;
-        const { 
-            selectedHabit 
+    renderRightPart() {
+        const { displayCreateHabitForm } = this.state;
+        const {
+            selectedHabit
         } = this.props;
 
-        if (!displayForm && !selectedHabit){
+        if (!displayCreateHabitForm && !selectedHabit) {
             return (
                 <p> Please Select A Habit </p>
             )
-        } else if (selectedHabit){
-            return (<HabitInfo/>)
-        } else if (displayForm){
-            return (<Form />)
+        } else if (selectedHabit) {
+            return (<HabitInfo history={this.props.history}/>)
+        } else if (displayCreateHabitForm) {
+            return (<Form history={this.props.history}/>)
         }
     }
 
-    handleClick(habitName){
-        const {dispatchUpdateHabitSelection} = this.props;
+    handleClick(habitName) {
+        const { dispatchUpdateHabitSelection, dispatchUpdateSelectedDate } = this.props;
         dispatchUpdateHabitSelection(habitName);
-        this.setState({displayForm: false});
+        this.setState({ displayCreateHabitForm: false });
+        dispatchUpdateSelectedDate(new Date(), null);
     }
 
-    handleAddButtonClick(){
-        const {dispatchUpdateHabitSelection} = this.props;
-        this.setState({ displayForm: true });
+    handleAddButtonClick() {
+        const { dispatchUpdateHabitSelection } = this.props;
+        this.setState({ displayCreateHabitForm: true });
         dispatchUpdateHabitSelection(null);
     }
 
     render() {
-        const { 
-            dispatchLogout, 
-            userInfo, 
-            userHabits, 
-            
-            selectedHabit 
+        const {
+            dispatchLogout,
+            userInfo,
+            userHabits,
+
+            selectedHabit
         } = this.props;
 
         if (!userInfo || !userHabits) {
@@ -139,6 +139,7 @@ const mapDispatchToProps = dispatch => ({
     dispatchGetUserInfo: (userId) => dispatch(getUserInfoAction(userId)),
     dispatchGetHabitsInfo: (userId) => dispatch(getHabitsAction(userId)),
     dispatchUpdateHabitSelection: habitName => dispatch(updateHabitSelectionAction(habitName)),
+    dispatchUpdateSelectedDate: (selectedDate, times) => dispatch(updateSelectedDateAction(selectedDate, times)),
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Home);

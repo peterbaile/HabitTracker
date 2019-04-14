@@ -9,8 +9,10 @@ import {
     getHabitsAction,
     updateHabitAction,
     updateSelectedDateAction,
+    removeHabitAction,
 } from '../actions/index';
 import Calendar from './Calendar';
+import Form from './HabitForm';
 
 const Handle = Slider.Handle;
 
@@ -40,6 +42,14 @@ class HabitInfo extends Component {
             date: new Date(),
             target: null,
             displaySlider: false,
+            displayForm: false,
+        }
+    }
+
+    componentWillUpdate(newProps){
+        const {selectedHabit} = this.props;
+        if (selectedHabit !== newProps.selectedHabit){
+            this.setState({target: null, displaySlider: false, displayForm: false});
         }
     }
 
@@ -96,6 +106,10 @@ class HabitInfo extends Component {
         return null;
     }
 
+    handleEditButtonClick = () => {
+        this.setState({displayForm: true});
+    }
+
     handleResetButtonClick = () => {
         this.setState({ target: null, displaySlider: true });
     }
@@ -103,7 +117,7 @@ class HabitInfo extends Component {
     handleSliderButtonClick = () => this.setState({ displaySlider: !this.state.displaySlider });
 
     render() {
-        const { target } = this.state;
+        const { displayForm } = this.state;
 
         const { userHabits, selectedHabit, selectedDate, times } = this.props;
 
@@ -114,38 +128,55 @@ class HabitInfo extends Component {
         const prefixMessageArray = ['Come On', "Don't be afriad", "Get this shit done"];
         const emojiArray = ["😃", "😄", "😁", "😀"];
 
+        if (displayForm){
+            return (
+                <Form history={this.props.history}/>
+            )
+        }
+
         return (
-            <div className="content">
-                <section class="hero is-warning has-text-centered">
-                    <div className="hero-body">
-                        <div className="container">
-                            <h1 className="title" style={{ marginBottom: "20px" }}> {habit.name.toUpperCase()} </h1>
-                            <h1 class="is-size-4 has-text-white" style={{ marginBottom: "20px" }}> {displayDate} </h1>
-                            <nav className="level has-text-white has-text-weight-bold">
-                                <div className="level-item">
-                                    <div>
-                                        <i className="fas fa-redo" style={{ cursor: "pointer" }} onClick={e => { this.handleResetButtonClick() }}></i>
+            <>
+                <div className="content">
+                    <section class="hero is-warning has-text-centered">
+                        <div className="hero-body">
+                            <div className="container">
+                                <div className="columns">
+                                    <div className="column is-one-third">
+                                    </div>
+                                    <div className="column is-one-third">
+                                        <h1 class="title">{habit.name.toUpperCase()}</h1>
+                                    </div>
+                                    <div className="column">
+                                        <i className="fas fa-edit is-size-4" style={{ cursor: "pointer" }} onClick={e => {this.handleEditButtonClick()}} ></i>
                                     </div>
                                 </div>
-                                <div className="level-item">
-                                    <div>
-                                        <h1 class="is-size-1 has-text-white"> {typeof times === 'number' ? times : "--"} </h1>
+                                <h1 class="is-size-4 has-text-white" style={{ marginBottom: "20px" }}> {displayDate} </h1>
+                                <nav className="level has-text-white has-text-weight-bold">
+                                    <div className="level-item">
+                                        <div>
+                                            <i className="fas fa-redo" style={{ cursor: "pointer" }} onClick={e => { this.handleResetButtonClick() }}></i>
+                                        </div>
                                     </div>
-                                </div>
-                                <div className="level-item">
-                                    <div>
-                                        <i className="fas fa-sliders-h" style={{ cursor: "pointer" }} onClick={e => { this.handleSliderButtonClick() }}></i>
+                                    <div className="level-item">
+                                        <div>
+                                            <h1 class="is-size-1 has-text-white"> {typeof times === 'number' ? times : "--"} </h1>
+                                        </div>
                                     </div>
-                                </div>
-                            </nav>
-                            {this.renderSlider()}
+                                    <div className="level-item">
+                                        <div>
+                                            <i className="fas fa-sliders-h" style={{ cursor: "pointer" }} onClick={e => { this.handleSliderButtonClick() }}></i>
+                                        </div>
+                                    </div>
+                                </nav>
+                                {this.renderSlider()}
+                            </div>
                         </div>
-                    </div>
-                </section>
-                {/* <p> {prefixMessageArray[Math.floor(Math.random() * prefixMessageArray.length)]}! "{habit.message}" {emojiArray[Math.floor(Math.random() * emojiArray.length)]} </p> */}
-                <br />
-                <Calendar />
-            </div>
+                    </section>
+                    {/* <p> {prefixMessageArray[Math.floor(Math.random() * prefixMessageArray.length)]}! "{habit.message}" {emojiArray[Math.floor(Math.random() * emojiArray.length)]} </p> */}
+                    <br />
+                    <Calendar />
+                </div>
+            </>
         );
     }
 
@@ -169,6 +200,7 @@ const mapDispatchToProps = dispatch => ({
     dispatchGetHabitsInfo: (userId) => dispatch(getHabitsAction(userId)),
     dispatchUpdateHabit: (userId, updateSet) => dispatch(updateHabitAction(userId, updateSet)),
     dispatchUpdateSelectedDate: (selectedDate, times) => dispatch(updateSelectedDateAction(selectedDate, times)),
+    dispatchRemoveHabit: (userId, habitName) => dispatch(removeHabitAction(userId, habitName)),
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(HabitInfo);

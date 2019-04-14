@@ -130,11 +130,13 @@ const Mutation = new GraphQLObjectType({
 
                 const originalHabits = originalUserInfo.habits;
 
+                
+
                 // update originalHabits to newHabits
                 originalHabits.map(habit => {
                     if (habit.name === habitName) {
                         for (x in updateSet) {
-                            if (x === 'records') {
+                            if (x === 'records' && updateSet.records[0].date) {
                                 // check if the record at the same date already exists
                                 const dateArray = habit.records.filter(record => {
                                     const existingDate = record.date;
