@@ -64,9 +64,9 @@ const Mutation = new GraphQLObjectType({
                     throw new Error("Error: Your email, password, or username is empty");
                 }
 
-                const users = await Users.findOne({email: user.email});
+                const users = await Users.findOne({ email: user.email });
 
-                if (users){
+                if (users) {
                     throw new Error("Found Duplicate Emails");
                 }
 
@@ -130,31 +130,32 @@ const Mutation = new GraphQLObjectType({
 
                 const originalHabits = originalUserInfo.habits;
 
-                
-
                 // update originalHabits to newHabits
                 originalHabits.map(habit => {
                     if (habit.name === habitName) {
                         for (x in updateSet) {
-                            if (x === 'records' && updateSet.records[0].date) {
+                            // check if the record in the updateSet actually contains value
+                            if (x === 'records' && Object.keys(updateSet.records[0]).length !== 0) {
+                                // habit.records is []
                                 // check if the record at the same date already exists
                                 const dateArray = habit.records.filter(record => {
                                     const existingDate = record.date;
                                     const updateDate = updateSet['records'][0].date;
+
                                     return convertDate(existingDate) === convertDate(updateDate);
                                 });
 
-                                // record does not exist
                                 if (dateArray.length === 0) {
                                     habit.records.push(updateSet['records'][0]);
                                 } else {
+                                    // record does not exist
                                     habit.records.map(record => {
                                         if (convertDate(record.date) === convertDate(updateSet['records'][0].date)) {
                                             record.times = updateSet['records'][0].times
                                         }
                                     })
                                 }
-                            } else {
+                            } else if (x !== 'records'){
                                 habit[x] = updateSet[x];
                             }
                         }
