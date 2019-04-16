@@ -119,6 +119,8 @@ class HabitInfo extends Component {
     render() {
         const { displayForm } = this.state;
 
+        console.log(displayForm);
+
         const { userHabits, selectedHabit, selectedDate, times } = this.props;
 
         const habit = userHabits.filter(habit => habit.name === selectedHabit)[0];

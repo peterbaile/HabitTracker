@@ -180,17 +180,28 @@ export const addHabitAction = (userId, updateSet) => {
 
 export const updateHabitAction = (userId, updateSet) => {
     return (dispatch) => {
+        dispatch({
+            type: getHabitsInfo,
+            habitsInfo: null,
+            message: null,
+        })
         updateSet.userId = userId;
-        console.log("!!!");
         client.mutate({mutation: updateHabitMutation, variables: updateSet}).then(
             result => {
                 const habits = result.data.updateHabit.habits;
                 dispatch({
                     type: getHabitsInfo,
                     habitsInfo: habits,
+                    message: "Success: Successful Updates"
                 })
             }
-        )
+        ).catch(err => {
+            dispatch({
+                type: getHabitsInfo,
+                habitsInfo: null,
+                message: "Error: Error occurs"
+            })
+        })
     }
 }
 

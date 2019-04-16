@@ -20,6 +20,7 @@ const defaultState = {
     selectedHabit: null,
     selectedDate: new Date(),
     times: null,
+    responseMessage: null,
 }
 
 const rootReducer = (state = defaultState, action) => {
@@ -45,7 +46,8 @@ const rootReducer = (state = defaultState, action) => {
         case getHabitsInfo:
             return {
                 ...state,
-                userHabits: action.habitsInfo
+                userHabits: action.habitsInfo,
+                responseMessage: action.message,
             }
         case updateHabitSelection:
             return {
@@ -56,7 +58,7 @@ const rootReducer = (state = defaultState, action) => {
             return {
                 ...state,
                 selectedDate: action.selectedDate,
-                times: action.times
+                times: action.times,
             }
         default:
             return state;

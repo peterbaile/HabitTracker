@@ -79,7 +79,7 @@ class HabitForm extends Component {
 
         console.log(this.props);
         const { name, status, goalPeriod, target, message } = this.state;
-        const { userId, dispatchAddHabit, userHabits, selectedHabit } = this.props;
+        const { userId, dispatchAddHabit, userHabits, selectedHabit, responseMessage } = this.props;
 
         const habit = userHabits.filter(habit => habit.name === selectedHabit)[0];
 
@@ -151,7 +151,7 @@ class HabitForm extends Component {
                 </div>
 
                 <div className="field">
-                    <p className="help has-text-centered"> {userHabits && "Successful Update"} </p>
+                    <p className="help has-text-centered"> {responseMessage} </p>
                 </div>
             </>
         )
@@ -162,10 +162,12 @@ const mapStateToProps = ({
     userId,
     userHabits,
     selectedHabit,
+    responseMessage,
 }) => ({
     userId,
     userHabits,
     selectedHabit,
+    responseMessage,
 })
 
 const mapDispatchToProps = dispatch => ({

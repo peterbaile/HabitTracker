@@ -44,9 +44,9 @@ class Home extends Component {
                 <p> Please Select A Habit </p>
             )
         } else if (selectedHabit) {
-            return (<HabitInfo history={this.props.history}/>)
+            return (<HabitInfo history={this.props.history} />)
         } else if (displayCreateHabitForm) {
-            return (<Form history={this.props.history}/>)
+            return (<Form history={this.props.history} />)
         }
     }
 
@@ -77,7 +77,9 @@ class Home extends Component {
         }
 
         return (
-            <section className="hero has-background-white-bis is-fullheight">
+            <section className="hero has-background-white-bis is-fullheight" style={{
+                display: "initial",
+            }}>
                 <h1 className="is-size-3"> Welcome, {userInfo.username} </h1>
                 <div className="field">
                     <p className="control">
@@ -88,8 +90,7 @@ class Home extends Component {
                 </div>
 
                 <div className="columns" style={{
-                    margin: "2%",
-                    height: window.innerHeight
+                    margin: "2%"
                 }}>
 
                     <div className="column is-one-third">
