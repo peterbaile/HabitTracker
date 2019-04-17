@@ -10,7 +10,6 @@ import {
     updateHabitAction,
     updateSelectedDateAction,
     removeHabitAction,
-    updateResponseMessageAction,
 } from '../actions/index';
 import Calendar from './Calendar';
 import Form from './HabitForm';
@@ -108,9 +107,7 @@ class HabitInfo extends Component {
     }
 
     handleEditButtonClick = () => {
-        const { dipatchUpdateResponseMessage } = this.props;
         this.setState({ displayForm: !this.state.displayForm });
-        dipatchUpdateResponseMessage(null);
     }
 
     handleResetButtonClick = () => {
@@ -123,6 +120,8 @@ class HabitInfo extends Component {
         const { displayForm } = this.state;
 
         const { userHabits, selectedHabit, selectedDate, times } = this.props;
+
+        console.log(selectedHabit);
 
         const habit = userHabits.filter(habit => habit.name === selectedHabit)[0];
 
@@ -204,7 +203,6 @@ const mapDispatchToProps = dispatch => ({
     dispatchUpdateHabit: (userId, updateSet) => dispatch(updateHabitAction(userId, updateSet)),
     dispatchUpdateSelectedDate: (selectedDate, times) => dispatch(updateSelectedDateAction(selectedDate, times)),
     dispatchRemoveHabit: (userId, habitName) => dispatch(removeHabitAction(userId, habitName)),
-    dipatchUpdateResponseMessage: (message) => dispatch(updateResponseMessageAction(message)),
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(HabitInfo);

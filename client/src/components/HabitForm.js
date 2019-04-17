@@ -10,6 +10,7 @@ import {
     addHabitAction,
     updateHabitAction,
     removeHabitAction,
+    updateResponseMessageAction,
 } from '../actions/index';
 
 
@@ -44,12 +45,14 @@ class HabitForm extends Component {
     }
 
     componentDidMount() {
-        const { userHabits, selectedHabit } = this.props;
+        const { userHabits, selectedHabit, dipatchUpdateResponseMessage } = this.props;
         const habit = userHabits.filter(habit => habit.name === selectedHabit)[0];
 
         if (habit) {
             this.setState({ oldName: habit.name, name: habit.name, status: habit.status, goalPeriod: habit.goalPeriod, target: habit.target, message: habit.message });
         }
+
+        dipatchUpdateResponseMessage(null);
     }
 
     onSliderChange = (value) => {
@@ -103,7 +106,7 @@ class HabitForm extends Component {
                 <div className="field">
                     <label className="label"> Enter a name for your habit </label>
                     <p className="control has-icons-left">
-                        <input className="input is-rounded" type="text" placeholder="Reading" defaultValue={habit ? habit.name : null} onChange={e => this.setState({ name: e.target.value })} />
+                        <input className="input is-rounded" type="text" placeholder="Reading" defaultValue={habit ? habit.name : null} onChange={e => this.setState({ name: e.target.value })}/>
                         <span className="icon is-small is-left">
                             <i className="fas fa-signature"></i>
                         </span>
@@ -189,6 +192,7 @@ const mapDispatchToProps = dispatch => ({
     dispatchAddHabit: (userId, updateSet) => dispatch(addHabitAction(userId, updateSet)),
     dispatchUpdateHabit: (userId, updateSet) => dispatch(updateHabitAction(userId, updateSet)),
     dispatchRemoveHabit: (userId, habitName) => dispatch(removeHabitAction(userId, habitName)),
+    dipatchUpdateResponseMessage: (message) => dispatch(updateResponseMessageAction(message)),
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(HabitForm);

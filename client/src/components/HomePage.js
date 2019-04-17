@@ -52,6 +52,7 @@ class Home extends Component {
     }
 
     handleClick(habitName) {
+        console.log(habitName);
         const { dispatchUpdateHabitSelection, dispatchUpdateSelectedDate } = this.props;
         dispatchUpdateHabitSelection(habitName);
         this.setState({ displayCreateHabitForm: false });
@@ -81,13 +82,11 @@ class Home extends Component {
             <section className="hero has-background-white-bis is-fullheight" style={{
                 display: "initial",
             }}>
-                <h1 className="is-size-3"> Welcome, {userInfo.username} </h1>
-                <div className="field">
-                    <p className="control">
-                        <button className="button is-primary" onClick={e => dispatchLogout()}>
-                            Logout
-                        </button>
-                    </p>
+                <div style={{ margin: "2%" }}>
+                    <h1 className="is-size-3"> Welcome, {userInfo.username} </h1>
+                    <button className="button is-primary" onClick={e => dispatchLogout()}>
+                        Logout
+                    </button>
                 </div>
 
                 <div className="columns" style={{

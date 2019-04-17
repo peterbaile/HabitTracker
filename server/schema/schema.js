@@ -123,9 +123,10 @@ const Mutation = new GraphQLObjectType({
             type: habitsType,
             args: getGraphQLUpdateArgs(habitsType),
             resolve: getMongoDbUpdateResolver(habitsType, async (filter, update) => {
-                const updateSet = update['$set'].habits[0];
+                let updateSet = update['$set'].habits[0];
+                updateSet.name = updateSet.name.toLowerCase();
                 const userId = mongoose.Types.ObjectId(filter.userId['$eq']);
-                const habitName = filter.habits['$elemMatch'].name['$eq'];
+                const habitName = filter.habits['$elemMatch'].name['$eq'].toLowerCase();
 
                 const originalUserInfo = await Habits.findOne({ userId: userId });
 

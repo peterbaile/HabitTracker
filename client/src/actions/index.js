@@ -201,6 +201,13 @@ export const getHabitsAction = (userId) => {
 export const addHabitAction = (userId, updateSet) => {
     return (dispatch) => {
         updateSet.userId = userId;
+        if (updateSet.name === '') {
+            dispatch({
+                type: updateResponseMessage,
+                responseMessage: "Error: Habit Name cannot be empty",
+            });
+            return;
+        }
         client.mutate({ mutation: addHabitMutation, variables: updateSet }).then(
             result => {
                 const habits = result.data.addHabit.habits;
@@ -235,10 +242,6 @@ export const updateHabitAction = (userId, updateSet) => {
                 dispatch({
                     type: updateResponseMessage,
                     responseMessage: "Success: Successful Updates",
-                });
-                dispatch({
-                    type: updateHabitSelection,
-                    selectedHabit: updateSet.name
                 });
             }
         ).catch(err => {
