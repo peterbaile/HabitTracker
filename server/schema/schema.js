@@ -100,7 +100,8 @@ const Mutation = new GraphQLObjectType({
 
                 // If there is ≥1 habit for the user
                 const originalHabits = originalUserInfo.habits;
-                const newHabit = update['$set'].habits[0];
+                let newHabit = update['$set'].habits[0];
+                newHabit.name = newHabit.name.toLowerCase();
 
                 // check if there is a duplication of name for the newHabit
                 const habitArray = originalHabits.filter(habit => habit.name === newHabit.name);

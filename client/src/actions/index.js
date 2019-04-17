@@ -37,6 +37,15 @@ export const updateSelectedDateAction = (currentDate, times) => {
     }
 }
 
+export const updateResponseMessageAction = (message) => {
+    return (dispatch) => {
+        dispatch({
+            type: updateResponseMessage,
+            responseMessage: message,
+        })
+    }
+}
+
 export const loginAction = (email, password) => {
     return (dispatch) => {
         dispatch({
@@ -200,7 +209,12 @@ export const addHabitAction = (userId, updateSet) => {
                     habitsInfo: habits,
                 })
             }
-        )
+        ).catch(err => {
+            dispatch({
+                type: updateResponseMessage,
+                responseMessage: err.graphQLErrors[0].message,
+            });
+        })
     }
 }
 
