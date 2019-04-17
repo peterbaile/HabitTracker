@@ -4,7 +4,6 @@ import ApolloClient from 'apollo-boost';
 // Import Variables
 import {
     updateLoginStatus,
-    updateSignUpStatus,
     getUserInfo,
     getHabitsInfo,
     updateHabitSelection,
@@ -233,7 +232,7 @@ export const updateHabitAction = (userId, updateSet) => {
                 });
                 dispatch({
                     type: updateResponseMessage,
-                    responseMessage: "Success: Successful Updates",
+                    responseMessage: "Successful Updates",
                 });
             }
         ).catch(err => {

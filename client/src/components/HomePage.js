@@ -52,7 +52,6 @@ class Home extends Component {
     }
 
     handleClick(habitName) {
-        console.log(habitName);
         const { dispatchUpdateHabitSelection, dispatchUpdateSelectedDate } = this.props;
         dispatchUpdateHabitSelection(habitName);
         this.setState({ displayCreateHabitForm: false });

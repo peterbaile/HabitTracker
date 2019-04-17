@@ -121,8 +121,6 @@ class HabitInfo extends Component {
 
         const { userHabits, selectedHabit, selectedDate, times } = this.props;
 
-        console.log(selectedHabit);
-
         const habit = userHabits.filter(habit => habit.name === selectedHabit)[0];
 
         const displayDate = `${selectedDate.getMonth() + 1}/${selectedDate.getDate()}/${selectedDate.getFullYear()}`;
