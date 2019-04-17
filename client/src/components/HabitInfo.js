@@ -46,10 +46,10 @@ class HabitInfo extends Component {
         }
     }
 
-    componentWillUpdate(newProps){
-        const {selectedHabit} = this.props;
-        if (selectedHabit !== newProps.selectedHabit){
-            this.setState({target: null, displaySlider: false, displayForm: false});
+    componentWillUpdate(newProps) {
+        const { selectedHabit } = this.props;
+        if (selectedHabit !== newProps.selectedHabit) {
+            this.setState({ target: null, displaySlider: false, displayForm: false });
         }
     }
 
@@ -84,11 +84,11 @@ class HabitInfo extends Component {
             selectedDate
         } = this.props;
         const { target } = this.state;
-        dispatchUpdateHabit(userId, { name: selectedHabit, date: selectedDate, times: target });
+        dispatchUpdateHabit(userId, { oldName: selectedHabit, name: selectedHabit, date: selectedDate, times: target });
         dispatchUpdateSelectedDate(selectedDate, target);
     }
 
-    renderSlider() {
+    renderSlider = () => {
         const { displaySlider, target } = this.state;
         if (displaySlider) {
             return (
@@ -96,7 +96,7 @@ class HabitInfo extends Component {
                     <Slider handle={handle} value={target} onChange={this.onSliderChange} />
                     <br />
                     <p> New Times of Achievement: {typeof target === 'number' ? target : "--"} </p>
-                    <a className="button is-info is-rounded" onClick={e => { this.handleSaveButtonClick() }}>
+                    <a className="button is-info is-rounded" onClick={this.handleSaveButtonClick}>
                         Save your record ~
                     </a>
                 </>
@@ -107,7 +107,7 @@ class HabitInfo extends Component {
     }
 
     handleEditButtonClick = () => {
-        this.setState({displayForm: true});
+        this.setState({ displayForm: !this.state.displayForm });
     }
 
     handleResetButtonClick = () => {
@@ -119,8 +119,6 @@ class HabitInfo extends Component {
     render() {
         const { displayForm } = this.state;
 
-        console.log(displayForm);
-
         const { userHabits, selectedHabit, selectedDate, times } = this.props;
 
         const habit = userHabits.filter(habit => habit.name === selectedHabit)[0];
@@ -130,43 +128,43 @@ class HabitInfo extends Component {
         const prefixMessageArray = ['Come On', "Don't be afriad", "Get this shit done"];
         const emojiArray = ["😃", "😄", "😁", "😀"];
 
-        if (displayForm){
+        if (displayForm) {
             return (
-                <Form history={this.props.history}/>
+                <Form handleEditFunction={this.handleEditButtonClick} />
             )
         }
 
         return (
             <>
                 <div className="content">
-                    <section class="hero is-warning has-text-centered">
+                    <section className="hero is-warning has-text-centered">
                         <div className="hero-body">
                             <div className="container">
                                 <div className="columns">
                                     <div className="column is-one-third">
                                     </div>
                                     <div className="column is-one-third">
-                                        <h1 class="title">{habit.name.toUpperCase()}</h1>
+                                        <h1 className="title">{habit.name.toUpperCase()}</h1>
                                     </div>
                                     <div className="column">
-                                        <i className="fas fa-edit is-size-4" style={{ cursor: "pointer" }} onClick={e => {this.handleEditButtonClick()}} ></i>
+                                        <i className="fas fa-edit is-size-4" style={{ cursor: "pointer" }} onClick={this.handleEditButtonClick} ></i>
                                     </div>
                                 </div>
-                                <h1 class="is-size-4 has-text-white" style={{ marginBottom: "20px" }}> {displayDate} </h1>
+                                <h1 className="is-size-4 has-text-white" style={{ marginBottom: "20px" }}> {displayDate} </h1>
                                 <nav className="level has-text-white has-text-weight-bold">
                                     <div className="level-item">
                                         <div>
-                                            <i className="fas fa-redo" style={{ cursor: "pointer" }} onClick={e => { this.handleResetButtonClick() }}></i>
+                                            <i className="fas fa-redo" style={{ cursor: "pointer" }} onClick={this.handleResetButtonClick}></i>
                                         </div>
                                     </div>
                                     <div className="level-item">
                                         <div>
-                                            <h1 class="is-size-1 has-text-white"> {typeof times === 'number' ? times : "--"} </h1>
+                                            <h1 className="is-size-1 has-text-white"> {typeof times === 'number' ? times : "--"} </h1>
                                         </div>
                                     </div>
                                     <div className="level-item">
                                         <div>
-                                            <i className="fas fa-sliders-h" style={{ cursor: "pointer" }} onClick={e => { this.handleSliderButtonClick() }}></i>
+                                            <i className="fas fa-sliders-h" style={{ cursor: "pointer" }} onClick={this.handleSliderButtonClick}></i>
                                         </div>
                                     </div>
                                 </nav>

@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import uuid from 'uuid';
 
 import {
     logoutAction,
@@ -44,9 +45,9 @@ class Home extends Component {
                 <p> Please Select A Habit </p>
             )
         } else if (selectedHabit) {
-            return (<HabitInfo history={this.props.history} />)
+            return (<HabitInfo />)
         } else if (displayCreateHabitForm) {
-            return (<Form history={this.props.history} />)
+            return (<Form />)
         }
     }
 
@@ -102,7 +103,9 @@ class Home extends Component {
                             <ul className="menu-list">
                                 {userHabits.map(habit => {
                                     return (
-                                        <li><a className={habit.name === selectedHabit ? "is-active" : null} onClick={e => this.handleClick(habit.name)}> {habit.name.toUpperCase()} </a> </li>
+                                        <li key={uuid()}>
+                                            <a className={habit.name === selectedHabit ? "is-active" : null} onClick={e => this.handleClick(habit.name)}> {habit.name.toUpperCase()}</a>
+                                        </li>
                                     )
                                 })}
                             </ul>

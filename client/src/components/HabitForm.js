@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import Slider from 'rc-slider';
+import uuid from 'uuid';
 import Tooltip from 'rc-tooltip';
 import 'rc-slider/assets/index.css';
 import 'rc-tooltip/assets/bootstrap.css';
@@ -8,6 +9,7 @@ import 'rc-tooltip/assets/bootstrap.css';
 import {
     addHabitAction,
     updateHabitAction,
+    removeHabitAction,
 } from '../actions/index';
 
 
@@ -32,6 +34,7 @@ class HabitForm extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            oldName: "",
             name: "",
             status: "Build",
             goalPeriod: "Daily",
@@ -45,7 +48,7 @@ class HabitForm extends Component {
         const habit = userHabits.filter(habit => habit.name === selectedHabit)[0];
 
         if (habit) {
-            this.setState({ name: habit.name, status: habit.status, goalPeriod: habit.goalPeriod, target: habit.target, message: habit.message });
+            this.setState({ oldName: habit.name, name: habit.name, status: habit.status, goalPeriod: habit.goalPeriod, target: habit.target, message: habit.message });
         }
     }
 
@@ -59,12 +62,26 @@ class HabitForm extends Component {
     }
 
     renderSubmitButton = (habit) => {
-        const { dispatchAddHabit, dispatchUpdateHabit, userId } = this.props;
+        const { dispatchAddHabit, userId, dispatchRemoveHabit, selectedHabit, handleEditFunction } = this.props;
         if (habit) {
             return (
-                <button className="button is-warning" onClick={e => this.handleUpdateHabitClick()}>
-                    Update Habit ~
-                </button>
+                <div className="field is-grouped">
+                    <div className="control">
+                        <button className="button is-warning is-rounded" onClick={e => this.handleUpdateHabitClick()}>
+                            Update Habit ~
+                        </button>
+                    </div>
+                    <div className="control">
+                        <button className="button is-info is-rounded" onClick={e => handleEditFunction()}>
+                            Return to the habit
+                        </button>
+                    </div>
+                    <div className="control">
+                        <button className="button is-danger is-rounded" onClick={e => dispatchRemoveHabit(userId, selectedHabit)}>
+                            Remove the habit
+                        </button>
+                    </div>
+                </div>
             )
         }
 
@@ -76,10 +93,8 @@ class HabitForm extends Component {
     }
 
     render() {
-
-        console.log(this.props);
-        const { name, status, goalPeriod, target, message } = this.state;
-        const { userId, dispatchAddHabit, userHabits, selectedHabit, responseMessage } = this.props;
+        const { goalPeriod, target } = this.state;
+        const { userHabits, selectedHabit, responseMessage } = this.props;
 
         const habit = userHabits.filter(habit => habit.name === selectedHabit)[0];
 
@@ -97,23 +112,23 @@ class HabitForm extends Component {
 
                 <div className="field">
                     <label className="label"> Choose a status for your habit </label>
-                    <div class="control has-icons-left">
-                        <div class="select is-rounded">
+                    <div className="control has-icons-left">
+                        <div className="select is-rounded">
                             <select onChange={e => this.setState({ status: e.target.value })} defaultValue={habit ? habit.status : "Build"}>
                                 <option selected>Build</option>
                                 <option>Quit</option>
                             </select>
                         </div>
-                        <span class="icon is-left">
-                            <i class="fas fa-pencil-ruler"></i>
+                        <span className="icon is-left">
+                            <i className="fas fa-pencil-ruler"></i>
                         </span>
                     </div>
                 </div>
 
                 <div className="field">
                     <label className="label"> Choose a goal period </label>
-                    <div class="control has-icons-left">
-                        <div class="select is-rounded">
+                    <div className="control has-icons-left">
+                        <div className="select is-rounded">
                             <select onChange={e => this.setState({ goalPeriod: e.target.value })} defaultValue={habit ? habit.goalPeriod : "Daily"}>
                                 <option selected>Daily</option>
                                 <option>Weekly</option>
@@ -121,8 +136,8 @@ class HabitForm extends Component {
                                 <option>Yearly</option>
                             </select>
                         </div>
-                        <span class="icon is-left">
-                            <i class="fas fa-pencil-ruler"></i>
+                        <span className="icon is-left">
+                            <i className="fas fa-pencil-ruler"></i>
                         </span>
                     </div>
                 </div>
@@ -173,6 +188,7 @@ const mapStateToProps = ({
 const mapDispatchToProps = dispatch => ({
     dispatchAddHabit: (userId, updateSet) => dispatch(addHabitAction(userId, updateSet)),
     dispatchUpdateHabit: (userId, updateSet) => dispatch(updateHabitAction(userId, updateSet)),
+    dispatchRemoveHabit: (userId, habitName) => dispatch(removeHabitAction(userId, habitName)),
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(HabitForm);

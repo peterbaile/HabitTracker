@@ -9,6 +9,7 @@ import {
     getHabitsInfo,
     updateHabitSelection,
     updateSelectedDate,
+    updateResponseMessage,
 } from './action_types';
 
 import {
@@ -38,6 +39,11 @@ export const updateSelectedDateAction = (currentDate, times) => {
 
 export const loginAction = (email, password) => {
     return (dispatch) => {
+        dispatch({
+            type: updateResponseMessage,
+            responseMessage: null,
+        })
+
         client.query({ query: getUserQuery, variables: { email, password } }).then(
             result => {
                 const users = result.data.users;
@@ -46,14 +52,20 @@ export const loginAction = (email, password) => {
                         type: updateLoginStatus,
                         isAuthorized: false,
                         userId: null,
-                        message: "Error: Invalid Credentials"
+                    });
+                    dispatch({
+                        type: updateResponseMessage,
+                        responseMessage: "Error: Invalid Credentials",
                     })
                 } else {
                     dispatch({
                         type: updateLoginStatus,
                         isAuthorized: true,
                         userId: users[0].id,
-                        message: null,
+                    });
+                    dispatch({
+                        type: updateResponseMessage,
+                        responseMessage: null,
                     })
                 }
             }
@@ -73,11 +85,19 @@ export const logoutAction = () => {
 
 export const signUpAction = (email, password) => {
     return (dispatch) => {
+        dispatch({
+            type: updateResponseMessage,
+            responseMessage: null,
+        });
+
         if (!email || !password) {
             dispatch({
                 type: updateSignUpStatus,
                 signUpStatus: true,
-                signUpMessage: "Please input an email/ password",
+            });
+            dispatch({
+                type: updateResponseMessage,
+                responseMessage: "Please input an email/ password",
             })
             return;
         }
@@ -89,14 +109,20 @@ export const signUpAction = (email, password) => {
                     dispatch({
                         type: updateSignUpStatus,
                         signUpStatus: true,
-                        signUpMessage: "Error Occurs",
-                    })
+                    });
+                    dispatch({
+                        type: updateResponseMessage,
+                        responseMessage: "Error Occurs",
+                    });
                 } else {
                     dispatch({
                         type: updateSignUpStatus,
                         signUpStatus: true,
-                        signUpMessage: "Successful Signup",
-                    })
+                    });
+                    dispatch({
+                        type: updateResponseMessage,
+                        responseMessage: "Successful Signup",
+                    });
                 }
             }
         )
@@ -181,36 +207,60 @@ export const addHabitAction = (userId, updateSet) => {
 export const updateHabitAction = (userId, updateSet) => {
     return (dispatch) => {
         dispatch({
-            type: getHabitsInfo,
-            habitsInfo: null,
-            message: null,
-        })
+            type: updateResponseMessage,
+            responseMessage: null,
+        });
         updateSet.userId = userId;
-        client.mutate({mutation: updateHabitMutation, variables: updateSet}).then(
+        client.mutate({ mutation: updateHabitMutation, variables: updateSet }).then(
             result => {
                 const habits = result.data.updateHabit.habits;
                 dispatch({
                     type: getHabitsInfo,
                     habitsInfo: habits,
-                    message: "Success: Successful Updates"
-                })
+                });
+                dispatch({
+                    type: updateResponseMessage,
+                    responseMessage: "Success: Successful Updates",
+                });
+                dispatch({
+                    type: updateHabitSelection,
+                    selectedHabit: updateSet.name
+                });
             }
         ).catch(err => {
             dispatch({
                 type: getHabitsInfo,
                 habitsInfo: null,
-                message: "Error: Error occurs"
-            })
+            });
+            dispatch({
+                type: updateResponseMessage,
+                responseMessage: "Error: Error occurs",
+            });
         })
     }
 }
 
 export const removeHabitAction = (userId, name) => {
     return (dispatch) => {
-        client.mutate({mutation: removeHabitMutation, variables:{userId, name}}).then(
+        dispatch({
+            type: updateResponseMessage,
+            responseMessage: null,
+        });
+        client.mutate({ mutation: removeHabitMutation, variables: { userId, name } }).then(
             result => {
-                const habits = result.data;
-                console.log(habits);
+                const habits = result.data.removeHabit.habits;
+                dispatch({
+                    type: getHabitsInfo,
+                    habitsInfo: habits,
+                });
+                dispatch({
+                    type: updateResponseMessage,
+                    responseMessage: "Success: Successful Deletion",
+                });
+                dispatch({
+                    type: updateHabitSelection,
+                    selectedHabit: null,
+                })
             }
         )
     }

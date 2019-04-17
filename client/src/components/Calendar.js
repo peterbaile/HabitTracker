@@ -50,7 +50,7 @@ class Calendar extends Component {
         let blanks = [];
         for (let i = 0; i < firstDayOfMonth; i++) {
             blanks.push(
-                <td>{""}</td>
+                <td key={uuid()}>{""}</td>
             );
         }
 
@@ -97,7 +97,7 @@ class Calendar extends Component {
                                 </div>
                                 <div className="level-item">
                                     <div>
-                                        <h1 class="is-size-5"> {dateObject.format("MMMM")} </h1>
+                                        <h1 className="is-size-5"> {dateObject.format("MMMM")} </h1>
                                     </div>
                                 </div>
                                 <div className="level-item">
@@ -109,12 +109,12 @@ class Calendar extends Component {
                         </div>
                     </div>
                 </section>
-                <table class="table">
+                <table className="table">
                     <thead>
-                        <tr>
+                        <tr key={uuid()}>
                             {moment.weekdaysShort().map(day => {
                                 return (
-                                    <th> {day} </th>
+                                    <th key={uuid()}> {day} </th>
                                 )
                             })}
                         </tr>

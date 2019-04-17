@@ -70,8 +70,8 @@ mutation($userId: ID, $name: String, $status: String, $goalPeriod: String, $targ
 `
 
 export const updateHabitMutation = gql`
-mutation ($userId: ID, $name: String, $status: String, $goalPeriod: String, $target: Int, $message: String, $date: DateTime, $times: Int){
-  updateHabit(filter: {userId: {EQ: $userId}, habits: {name: {EQ: $name}}}, update: {set: {habits: [{name:$name, status:$status, goalPeriod: $goalPeriod, target: $target, message: $message, records: {date: $date, times: $times}}]}}) {
+mutation ($userId: ID, $oldName: String, $name: String, $status: String, $goalPeriod: String, $target: Int, $message: String, $date: DateTime, $times: Int){
+  updateHabit(filter: {userId: {EQ: $userId}, habits: {name: {EQ: $oldName}}}, update: {set: {habits: [{name:$name, status:$status, goalPeriod: $goalPeriod, target: $target, message: $message, records: {date: $date, times: $times}}]}}) {
     habits {
       name
       status
