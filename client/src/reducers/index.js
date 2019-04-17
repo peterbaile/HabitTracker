@@ -1,6 +1,5 @@
 import {
     updateLoginStatus,
-    updateSignUpStatus,
     getUserInfo,
     getHabitsInfo,
     updateHabitSelection,
@@ -9,11 +8,10 @@ import {
 } from '../actions/action_types';
 
 const defaultState = {
-    isAuthorized: true, //wrong
-    // isAuthorized: false,
-    userId: "5cafc7f6615d1d268211fc34", //wrong
-    // userId: null,
-    signUpStatus: false,
+    // isAuthorized: true, //wrong
+    isAuthorized: false,
+    // userId: "5cafc7f6615d1d268211fc34", //wrong
+    userId: null,
     userInfo: null,
     userHabits: null,
     selectedHabit: null,
@@ -35,11 +33,6 @@ const rootReducer = (state = defaultState, action) => {
                 isAuthorized: action.isAuthorized,
                 userId: action.userId,
             };
-        case updateSignUpStatus:
-            return {
-                ...state,
-                signUpStatus: action.signUpStatus,
-            }
         case getUserInfo:
             return {
                 ...state,

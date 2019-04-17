@@ -3,7 +3,8 @@ import { connect } from 'react-redux';
 
 import Home from './HomePage';
 import {
-    loginAction
+    loginAction,
+    updateResponseMessageAction,
 } from '../actions/index';
 
 
@@ -16,14 +17,18 @@ class Login extends Component {
         }
     }
 
+    componentDidMount() {
+        const { dipatchUpdateResponseMessage } = this.props;
+        dipatchUpdateResponseMessage(null);
+    }
+
     render() {
         const { email, password } = this.state;
-        const { dispatchLogin, isAuthorized, userId, loginMessage } = this.props;
-
+        const { dispatchLogin, isAuthorized, responseMessage, } = this.props;
 
         if (isAuthorized) {
             return (
-                <Home history={this.props.history}/>
+                <Home history={this.props.history} />
             )
         }
 
@@ -62,18 +67,18 @@ class Login extends Component {
                             <br />
                             <div className="field is-grouped is-grouped-centered">
                                 <p className="control">
-                                    <button className="button is-info disabled" disabled={email === "" || password === "" ? true : false} onClick={e => dispatchLogin(email, password)}>
+                                    <button className="button is-warning disabled is-rounded" disabled={email === "" || password === "" ? true : false} onClick={e => dispatchLogin(email, password)}>
                                         Login
                                     </button>
                                 </p>
                                 <p className="control">
-                                    <button className="button is-warning" onClick={e => this.props.history.push('./signup')}>
+                                    <button className="button is-info is-rounded" onClick={e => this.props.history.push('./signup')}>
                                         Create Account
                                     </button>
                                 </p>
                             </div>
                             <div className="field">
-                                <p className="help has-text-centered"> {loginMessage} </p>
+                                <p className="help has-text-centered"> {responseMessage} </p>
                             </div>
                         </div>
                     </div >
@@ -86,15 +91,16 @@ class Login extends Component {
 const mapStateToProps = ({
     isAuthorized,
     userId,
-    loginMessage,
+    responseMessage,
 }) => ({
     isAuthorized,
     userId,
-    loginMessage,
+    responseMessage,
 })
 
 const mapDispatchToProps = dispatch => ({
-    dispatchLogin: (email, password) => dispatch(loginAction(email, password))
+    dispatchLogin: (email, password) => dispatch(loginAction(email, password)),
+    dipatchUpdateResponseMessage: (message) => dispatch(updateResponseMessageAction(message)),
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Login);

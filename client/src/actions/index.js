@@ -88,53 +88,45 @@ export const logoutAction = () => {
             type: updateLoginStatus,
             isAuthorized: false,
             userId: null,
+        });
+        dispatch({
+            type: updateResponseMessage,
+            responseMessage: null,
         })
     }
 }
 
-export const signUpAction = (email, password) => {
+export const signUpAction = (email, password, username) => {
     return (dispatch) => {
         dispatch({
             type: updateResponseMessage,
             responseMessage: null,
         });
 
-        if (!email || !password) {
-            dispatch({
-                type: updateSignUpStatus,
-                signUpStatus: true,
-            });
+        if (!email || !password || !username || email.trim().length === 0 || password.trim().length === 0 || username.trim().length === 0) {
             dispatch({
                 type: updateResponseMessage,
-                responseMessage: "Please input an email/ password",
+                responseMessage: "Error: One of the input fields is empty",
             })
             return;
         }
 
-        client.mutate({ mutation: addUserMutation, variables: { email, password } }).then(
+        client.mutate({ mutation: addUserMutation, variables: { email, password, username } }).then(
             result => {
                 const user = result.data.addUser;
-                if (!user) {
-                    dispatch({
-                        type: updateSignUpStatus,
-                        signUpStatus: true,
-                    });
-                    dispatch({
-                        type: updateResponseMessage,
-                        responseMessage: "Error Occurs",
-                    });
-                } else {
-                    dispatch({
-                        type: updateSignUpStatus,
-                        signUpStatus: true,
-                    });
+                if (user){
                     dispatch({
                         type: updateResponseMessage,
                         responseMessage: "Successful Signup",
                     });
                 }
             }
-        )
+        ).catch(err => {
+            dispatch({
+                type: updateResponseMessage,
+                responseMessage: err.graphQLErrors[0].message,
+            });
+        })
     }
 }
 

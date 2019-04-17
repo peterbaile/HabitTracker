@@ -67,7 +67,7 @@ const Mutation = new GraphQLObjectType({
                 const users = await Users.findOne({ email: user.email });
 
                 if (users) {
-                    throw new Error("Found Duplicate Emails");
+                    throw new Error("Error: Found Duplicate Emails");
                 }
 
                 return await Users.create(update['$set']);
