@@ -58,7 +58,6 @@ export const loginAction = (email, password) => {
                 if (users.length === 0) {
                     dispatch({
                         type: updateLoginStatus,
-                        isAuthorized: false,
                         userId: null,
                     });
                     dispatch({
@@ -68,7 +67,6 @@ export const loginAction = (email, password) => {
                 } else {
                     dispatch({
                         type: updateLoginStatus,
-                        isAuthorized: true,
                         userId: users[0].id,
                     });
                     dispatch({
@@ -85,7 +83,6 @@ export const logoutAction = () => {
     return (dispatch) => {
         dispatch({
             type: updateLoginStatus,
-            isAuthorized: false,
             userId: null,
         });
         dispatch({

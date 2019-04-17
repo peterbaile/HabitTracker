@@ -22,11 +22,20 @@ class Login extends Component {
         dipatchUpdateResponseMessage(null);
     }
 
+    onLoginButtonClick = () => {
+        const { dispatchLogin } = this.props;
+        const { email, password } = this.state;
+        dispatchLogin(email, password);
+        this.setState({ email: null, password: null });
+    }
+
     render() {
         const { email, password } = this.state;
-        const { dispatchLogin, isAuthorized, responseMessage, } = this.props;
+        const { responseMessage, userId } = this.props;
 
-        if (isAuthorized) {
+        console.log(userId);
+
+        if (userId) {
             return (
                 <Home history={this.props.history} />
             )
@@ -67,7 +76,7 @@ class Login extends Component {
                             <br />
                             <div className="field is-grouped is-grouped-centered">
                                 <p className="control">
-                                    <button className="button is-warning disabled is-rounded" disabled={email === "" || password === "" ? true : false} onClick={e => dispatchLogin(email, password)}>
+                                    <button className="button is-warning disabled is-rounded" disabled={email === "" || password === "" ? true : false} onClick={this.onLoginButtonClick}>
                                         Login
                                     </button>
                                 </p>
@@ -89,11 +98,9 @@ class Login extends Component {
 }
 
 const mapStateToProps = ({
-    isAuthorized,
     userId,
     responseMessage,
 }) => ({
-    isAuthorized,
     userId,
     responseMessage,
 })

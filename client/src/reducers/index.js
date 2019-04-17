@@ -9,7 +9,6 @@ import {
 
 const defaultState = {
     // isAuthorized: true, //wrong
-    isAuthorized: false,
     // userId: "5cafc7f6615d1d268211fc34", //wrong
     userId: null,
     userInfo: null,
@@ -30,7 +29,6 @@ const rootReducer = (state = defaultState, action) => {
         case updateLoginStatus:
             return {
                 ...state,
-                isAuthorized: action.isAuthorized,
                 userId: action.userId,
             };
         case getUserInfo:
