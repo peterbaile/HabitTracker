@@ -7,7 +7,6 @@ import {
     updateSelectedDateAction,
     updateHabitAction,
 } from '../actions/index';
-import '../style/index.css';
 
 const convertDate = (date) => {
     return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`
