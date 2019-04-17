@@ -33,8 +33,6 @@ class Login extends Component {
         const { email, password } = this.state;
         const { responseMessage, userId } = this.props;
 
-        console.log(userId);
-
         if (userId) {
             return (
                 <Home history={this.props.history} />
