@@ -172,7 +172,7 @@ export const getHabitsAction = (userId) => {
                 if (!result.data.habits) {
                     dispatch({
                         type: getHabitsInfo,
-                        habitsInfo: []
+                        habitsInfo: [],
                     })
                 } else {
                     const habits = result.data.habits.habits;

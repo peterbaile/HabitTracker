@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import { Bar, Line } from 'react-chartjs-2';
 import Slider from 'rc-slider';
 import Tooltip from 'rc-tooltip';
+import randomColor from 'randomcolor';
 import 'rc-slider/assets/index.css';
 import 'rc-tooltip/assets/bootstrap.css';
 
@@ -13,6 +15,25 @@ import {
 } from '../actions/index';
 import Calendar from './Calendar';
 import Form from './HabitForm';
+
+const options = {
+    legend: {
+        display: false,
+    },
+    title: {
+        display: true,
+        text: "Your Progress",
+        fontSize: 25
+    },
+    scales: {
+        yAxes: [{
+            display: true,
+            ticks: {
+                beginAtZero: true   // minimum value will be 0.
+            }
+        }]
+    }
+}
 
 const Handle = Slider.Handle;
 
@@ -35,6 +56,47 @@ const convertDate = (date) => {
     return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`
 }
 
+const compare = (record1, record2) => {
+    const date1 = new Date(record1.date);
+    const date2 = new Date(record2.date);
+
+    if (date1 <= date2){
+        return -1
+    } else {
+        return 1
+    }
+}
+
+const getGoalData = (recordsArray) => {
+    let backgroundColor = [];
+    let labels = [];
+    let timesArray = [];
+
+    if (recordsArray) {
+        recordsArray.sort(compare);
+        recordsArray.map(record => {
+            backgroundColor.push(randomColor({
+                luminosity: 'light',
+                format: 'rgba',
+                alpha: 0.6,
+            }));
+
+            const date = new Date(record.date);
+
+            labels.push(`${date.getMonth() + 1}/${date.getDate()}`);
+            timesArray.push(record.times);
+        })
+    }
+
+    return {
+        labels: labels,
+        datasets: [{
+            data: timesArray,
+            backgroundColor: backgroundColor
+        }]
+    }
+}
+
 class HabitInfo extends Component {
     constructor(props) {
         super(props);
@@ -43,11 +105,13 @@ class HabitInfo extends Component {
             target: null,
             displaySlider: false,
             displayForm: false,
+            goalData: null,
         }
     }
 
     componentWillUpdate(newProps) {
         const { selectedHabit } = this.props;
+        
         if (selectedHabit !== newProps.selectedHabit) {
             this.setState({ target: null, displaySlider: false, displayForm: false });
         }
@@ -81,7 +145,7 @@ class HabitInfo extends Component {
             dispatchUpdateSelectedDate,
             userId,
             selectedHabit,
-            selectedDate
+            selectedDate,
         } = this.props;
         const { target } = this.state;
         dispatchUpdateHabit(userId, { oldName: selectedHabit, name: selectedHabit, date: selectedDate, times: target });
@@ -175,6 +239,8 @@ class HabitInfo extends Component {
                     {/* <p> {prefixMessageArray[Math.floor(Math.random() * prefixMessageArray.length)]}! "{habit.message}" {emojiArray[Math.floor(Math.random() * emojiArray.length)]} </p> */}
                     <br />
                     <Calendar />
+                    <br />
+                    <Bar data={getGoalData(habit.records)} height={200} options={options} />
                 </div>
             </>
         );
