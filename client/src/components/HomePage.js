@@ -10,6 +10,7 @@ import {
     updateSelectedDateAction,
 } from '../actions/index';
 
+import Nav from './Nav';
 import Form from './HabitForm';
 import HabitInfo from './HabitInfo';
 
@@ -80,12 +81,7 @@ class Home extends Component {
             <section className="hero has-background-white-bis is-fullheight" style={{
                 display: "initial",
             }}>
-                <div style={{ margin: "2%" }}>
-                    <h1 className="is-size-3"> Welcome, {userInfo.username} </h1>
-                    <button className="button is-primary" onClick={e => dispatchLogout()}>
-                        Logout
-                    </button>
-                </div>
+                <Nav username={userInfo.username}/>
 
                 <div className="columns" style={{
                     margin: "2%"
