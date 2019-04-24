@@ -29,7 +29,7 @@ const options = {
         yAxes: [{
             display: true,
             ticks: {
-                beginAtZero: true   // minimum value will be 0.
+                beginAtZero: true
             }
         }]
     }
