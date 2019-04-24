@@ -8,8 +8,8 @@ import {
 } from '../actions/action_types';
 
 const defaultState = {
-    userId: "5cafc7f6615d1d268211fc34", //wrong
-    // userId: null,
+    // userId: "5cafc7f6615d1d268211fc34", //wrong
+    userId: null,
     userInfo: null,
     userHabits: null,
     selectedHabit: null,

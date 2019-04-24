@@ -69,7 +69,6 @@ class Home extends Component {
             dispatchLogout,
             userInfo,
             userHabits,
-
             selectedHabit
         } = this.props;
 
